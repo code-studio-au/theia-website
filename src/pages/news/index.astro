@@ -1,0 +1,32 @@
+---
+import Inner from '../../layouts/Inner.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import { publishedNews } from '../../lib/news';
+import { url } from '../../lib/site';
+const posts = await publishedNews();
+---
+<Inner title="News from Theia" eyebrow="The latest from our world" description="Development updates, stories from the world, and news from the journey ahead." image="images/hero.webp">
+  <div class="news-toolbar">
+    <div class="news-filters" role="group" aria-label="Filter news by category">
+      {['All', 'Development', 'Lore', 'Community'].map((category) => <button type="button" data-filter={category} aria-pressed={category === 'All' ? 'true' : 'false'}>{category}</button>)}
+    </div>
+    <a href={url('rss.xml')}>Subscribe via RSS</a>
+  </div>
+  <p id="news-count" class="visually-hidden" aria-live="polite"></p>
+  <div class="news-grid news-list">{posts.map((post) => <NewsCard post={post} showDate />)}</div>
+  <p id="news-empty" class="note" hidden>No news in this category yet. Check back soon.</p>
+</Inner>
+<script>
+  const filters = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
+  const cards = document.querySelectorAll<HTMLElement>('.news-list [data-category]');
+  filters.forEach((button) => button.addEventListener('click', () => {
+    const category = button.dataset.filter;
+    filters.forEach((filter) => filter.setAttribute('aria-pressed', String(filter === button)));
+    let count = 0;
+    cards.forEach((card) => { card.hidden = category !== 'All' && card.dataset.category !== category; if (!card.hidden) count++; });
+    const status = document.getElementById('news-count');
+    const empty = document.getElementById('news-empty');
+    if (status) status.textContent = `${count} ${count === 1 ? 'article' : 'articles'} shown`;
+    if (empty) empty.hidden = count > 0;
+  }));
+</script>

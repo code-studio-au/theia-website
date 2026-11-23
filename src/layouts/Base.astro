@@ -1,0 +1,64 @@
+---
+import '../styles/global.css';
+import Logo from '../components/Logo.astro';
+import Button from '../components/Button.astro';
+import { site, url } from '../lib/site';
+interface Props { title?: string; description?: string; image?: string; home?: boolean; noindex?: boolean }
+const { title, description = site.description, image = 'images/hero.webp', home = false, noindex = false } = Astro.props;
+const documentTitle = title ? `${title} | Theia Online` : 'Theia Online — Explore a Living World';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const nav = [['Home', ''], ['World', 'world/'], ['Races', 'races/'], ['Story', 'story/'], ['Media', 'media/'], ['News', 'news/']];
+const active = (path: string) => path ? Astro.url.pathname.startsWith(url(path)) : Astro.url.pathname === url();
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#031725" />
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <link rel="alternate" type="application/rss+xml" title="Theia Online News" href={url('rss.xml')} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={documentTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(url(image), Astro.site)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {home && <link rel="preload" as="image" href={url('images/hero.webp')} />}
+    <title>{documentTitle}</title>
+  </head>
+  <body class:list={{ 'home-page': home }}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <Logo />
+        <button class="menu-toggle" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span></span><span></span><span></span></button>
+        <nav id="primary-navigation" aria-label="Main navigation">
+          {nav.map(([label, path]) => <a href={url(path)} aria-current={active(path) ? 'page' : undefined}>{label}</a>)}
+        </nav>
+        <div class="header-actions"><a class="login-link" href={url('download/#account')}><svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="10" cy="5" r="3.2"/><path d="M3 18v-3a7 7 0 0 1 14 0v3Z"/></svg>Log In</a><Button primary href={url('download/')}>Play Free</Button></div>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer ornate-rule">
+      <div class="footer-inner">
+        <Logo />
+        <nav aria-label="Footer navigation"><a href={url('about/')}>About</a><a href={url('support/')}>Support</a><a href={url('community/')}>Community</a><a href={url('media/')}>Media</a><a href={url('news/')}>News</a></nav>
+        <div class="footer-social"><a href={site.repository} aria-label="Theia on GitHub"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.86c-2.78.6-3.37-1.18-3.37-1.18-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.61.07-.61 1 .07 1.53 1.03 1.53 1.03.89 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.64-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02A9.6 9.6 0 0 1 12 6.82c.85 0 1.71.11 2.51.34 1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.94.36.31.68.92.68 1.85v2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"/></svg></a><a href={url('rss.xml')} aria-label="Subscribe to the news RSS feed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="5" cy="19" r="2" fill="currentColor" stroke="none"/><path d="M3 10a11 11 0 0 1 11 11M3 3a18 18 0 0 1 18 18"/></svg></a></div>
+      </div>
+      <p class="copyright">© {new Date().getUTCFullYear()} Theia Online <span>·</span> A world in the making</p>
+    </footer>
+    <script>
+      const toggle = document.querySelector<HTMLButtonElement>('.menu-toggle');
+      const nav = document.querySelector<HTMLElement>('#primary-navigation');
+      function closeMenu() { toggle?.setAttribute('aria-expanded', 'false'); toggle?.setAttribute('aria-label', 'Open navigation'); nav?.classList.remove('is-open'); }
+      toggle?.addEventListener('click', () => { const open = toggle.getAttribute('aria-expanded') !== 'true'; toggle.setAttribute('aria-expanded', String(open)); toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation'); nav?.classList.toggle('is-open', open); });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') { closeMenu(); toggle.focus(); } });
+      nav?.addEventListener('click', (event) => { if ((event.target as HTMLElement).closest('a')) closeMenu(); });
+      window.matchMedia('(min-width: 901px)').addEventListener('change', closeMenu);
+    </script>
+  </body>
+</html>

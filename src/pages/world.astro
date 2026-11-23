@@ -1,0 +1,17 @@
+---
+import Inner from '../layouts/Inner.astro';
+import Button from '../components/Button.astro';
+import { url } from '../lib/site';
+const regions = [
+  { title: 'The Human Heartlands', label: 'Where a journey begins', text: 'In Millhaven, Stoneford and Greyfall Quarry, ordinary lives meet extraordinary events. Roads, river crossings and working settlements form the opening of the Human campaign.' },
+  { title: 'Valecrown', label: 'Beyond the village roads', text: 'The Human campaign leads onward to Valecrown. Royal authority, contested accounts and the lives beyond the court become part of a story that reaches far beyond the Heartlands.' },
+  { title: 'The Wider World', label: 'Eight civilizations', text: 'Mountain holds, woodland realms, grasslands and storm coasts are home to peoples with their own customs and histories. Ancient knowledge survives in different forms across the world.' },
+  { title: 'The Shrouded Lands', label: 'A wounded homeland', text: 'At the centre of Theia’s troubled history lie the Shrouded Lands. Devastated by an ancient conflict and veiled from the wider world, they hold mysteries that generations have failed to settle.' },
+];
+---
+<Inner title="The World of Theia" eyebrow="Beyond the horizon" description="Living civilizations, forgotten wonders and a past that refuses to stay buried.">
+  <div class="prose"><p class="lead">Theia bears the scars of the Divine War. Its peoples have rebuilt, travelled and made new homes, even as fragments of an older world remain beneath their feet.</p><p>Two permanently opposed alliances—the Covenant and the Dominion—shape the modern world. Within their borders, life is more than war: villages work, cities grow, and every region has stories of its own.</p></div>
+  <div class="content-grid">{regions.map((region) => <section class="content-panel"><p class="eyebrow">{region.label}</p><h2>{region.title}</h2><p>{region.text}</p></section>)}</div>
+  <p class="note">A preview of Theia’s setting and planned campaign. The world is in development; final geography and playable regions will be shared as they are ready.</p>
+  <div class="callout"><h2>A world seen through many eyes</h2><p>Every people carries a different part of Theia’s history.</p><Button href={url('races/')}>Meet the Peoples of Theia</Button></div>
+</Inner>

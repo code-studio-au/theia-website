@@ -1,0 +1,9 @@
+---
+import Inner from '../layouts/Inner.astro';
+import Button from '../components/Button.astro';
+import { site, url } from '../lib/site';
+---
+<Inner title="A World to Share" eyebrow="The Theia community" description="Every journey begins somewhere. Be part of the story as Theia takes shape." image="images/hero.webp">
+  <div class="content-grid"><section class="content-panel"><h2>Follow the journey</h2><p>Discover development updates, stories from the world and future playtest announcements.</p><Button href={url('news/')}>Read the News</Button></section><section class="content-panel"><h2>Behind the scenes</h2><p>Explore the public development repository to follow the project’s work and report reproducible technical issues.</p><Button href={site.repository}>Theia on GitHub</Button></section></div>
+  <div class="prose"><h2>More ways to meet, in time</h2><p>Public playtests, community events and additional community channels will be announced here when they are ready.</p><p>For now, the <a href={url('rss.xml')}>RSS news feed</a> is a simple way to keep up with the world’s progress.</p></div>
+</Inner>

@@ -1,0 +1,17 @@
+---
+import Inner from '../layouts/Inner.astro';
+import Button from '../components/Button.astro';
+import { url } from '../lib/site';
+---
+<Inner title="A Deeper Story" eyebrow="What the past left behind" description="Ancient wonders. Conflicting histories. A mystery that begins close to home." image="images/story.webp">
+  <div class="prose">
+    <p class="lead">The people of Theia live among the remnants of an age they no longer fully understand. Their histories disagree. Their ruins hold fragments of forgotten knowledge. And something is stirring beneath familiar ground.</p>
+    <h2>The Age of Wonders</h2><p>In the Divine Age, extraordinary magical civilizations flourished. Great orders studied the workings of the world, archives gathered their discoveries, and ancient passageways connected distant places. Mortal scholars could question even divine teachings.</p>
+    <h2>A world changed</h2><p>The Divine War devastated those civilizations. Knowledge was lost, passageways were broken, and generations of migration reshaped the world. The events remembered through the Sunderings left the modern peoples with partial—and often conflicting—accounts of what came before.</p>
+    <h2>The mystery of the Anchors</h2><p>Old mechanisms are more than monuments to the past. Strange disturbances and unfamiliar devices raise questions that ordinary explanations cannot settle. Following their traces means listening carefully, weighing evidence and discovering who benefits when knowledge stays hidden.</p>
+    <h2>Begin with the Heartlands</h2><p>The Human campaign starts with the lives of people in Millhaven and the surrounding Heartlands. A troubled road, a missing shipment or a witness’s account can lead to something larger. But the world has stories worth discovering even beyond the principal campaign.</p>
+    <blockquote><p>The past does not speak with one voice. Which stories will you believe?</p></blockquote>
+    <p class="note">A spoiler-light introduction to the planned story. Campaign content is still in development.</p>
+    <Button href={url('news/lore-spotlight-anchors/')}>Read the Anchor Spotlight</Button>
+  </div>
+</Inner>

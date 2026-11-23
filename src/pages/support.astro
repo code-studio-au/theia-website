@@ -1,0 +1,13 @@
+---
+import Inner from '../layouts/Inner.astro';
+import { site, url } from '../lib/site';
+---
+<Inner title="How Can We Help?" eyebrow="Player support" description="Getting started, keeping up with development and finding the right place for technical questions.">
+  <div class="prose faq">
+    <details open><summary>Can I download the game?</summary><p>Public downloads are not available yet. The <a href={url('download/')}>download page</a> will carry verified links and requirements when a public release is ready.</p></details>
+    <details><summary>Where do I sign in?</summary><p>Account creation and sign-in happen in the game client. The public website does not collect passwords or provide an account portal.</p></details>
+    <details><summary>How do I follow progress?</summary><p>Read the <a href={url('news/')}>news</a> or subscribe to the <a href={url('rss.xml')}>RSS feed</a>. Future playtest information will be published there.</p></details>
+    <details><summary>How do I report a development issue?</summary><p>Use the <a href={`${site.repository}/issues`}>project’s GitHub issues</a>. Include the version, operating system, steps to reproduce and relevant logs. Remove passwords, access tokens and personal information from reports.</p></details>
+    <details><summary>Are these images in-game screenshots?</summary><p>The site currently displays illustrative concept artwork. Actual gameplay media will be identified as such when shared.</p></details>
+  </div>
+</Inner>

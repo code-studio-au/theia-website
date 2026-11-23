@@ -1,0 +1,13 @@
+---
+import Inner from '../layouts/Inner.astro';
+import { url } from '../lib/site';
+---
+<Inner title="Play Your Way" eyebrow="Find your place in Theia" description="Exploration, tactical combat and stories that give the journey meaning." image="images/hero.webp">
+  <div class="prose"><p class="lead">Theia is being built around a classic open-world MMO experience: a world worth exploring, companions worth travelling with, and choices that matter in an encounter.</p></div>
+  <div class="content-grid">
+    <section class="content-panel" id="combat"><img class="panel-icon" src={url('ui/swords.png')} alt="" width="50" height="50" /><h2>Combat with intent</h2><p>Combat development focuses on selected targets, deliberate facing, weapon-timed attacks and distinct abilities. Positioning, timing and understanding your opponent shape the encounter.</p><p class="note">Ability options and balance are in development.</p></section>
+    <section class="content-panel" id="crafting"><h2>Make your mark</h2><p>Professions and crafting are part of Theia’s wider design: a place for gathered resources, craftsmanship and the cultures that shape them.</p><p class="note">Crafting is planned. Recipes, profession progression and public availability have not yet been announced.</p></section>
+    <section class="content-panel"><h2>Follow your curiosity</h2><p>The world is designed to support regional stories alongside the principal campaign. The concerns of a village or the history of a ruin can be a journey of their own.</p></section>
+    <section class="content-panel"><img class="panel-icon" src={url('ui/party.png')} alt="" width="50" height="50" /><h2>Travel together</h2><p>Party and local chat systems are part of ongoing development. The aim is a shared world where companions can meet, communicate and face its challenges together.</p></section>
+  </div>
+</Inner>

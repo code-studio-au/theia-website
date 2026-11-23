@@ -1,0 +1,12 @@
+---
+import Base from './Base.astro';
+import { url } from '../lib/site';
+interface Props { title: string; eyebrow?: string; description: string; image?: string }
+const { title, eyebrow = 'Explore Theia', description, image = 'images/world.webp' } = Astro.props;
+---
+<Base title={title} description={description} image={image}>
+  <section class="inner-hero ornate-rule" style={`--section-image: url('${url(image)}')`}>
+    <div class="inner-hero-copy"><p class="eyebrow">{eyebrow}</p><h1>{title}</h1><p>{description}</p></div>
+  </section>
+  <div class="inner-content wrap"><slot /></div>
+</Base>

@@ -1,0 +1,9 @@
+---
+import Inner from '../layouts/Inner.astro';
+import { url } from '../lib/site';
+const images = [['hero', 'Beyond the horizon'], ['world', 'The ruins of an older world'], ['story', 'The mystery of the Anchors']];
+---
+<Inner title="Visions of Theia" eyebrow="Art & atmosphere" description="A glimpse of the world we imagine, from distant kingdoms to the echoes of ancient wonders.">
+  <p class="note" style="margin-bottom:25px">Website concept artwork, adapted with AI from the supplied visual direction. These illustrations are not in-game screenshots. Select an image to view it.</p>
+  <div class="gallery">{images.map(([name, title]) => <figure><a href={url(`images/${name}.webp`)} aria-label={`View ${title}`}><img src={url(`images/${name}.webp`)} alt={title} width="1024" height={name === 'hero' ? 440 : 214} loading="lazy" /></a><figcaption>{title} · Concept artwork</figcaption></figure>)}</div>
+</Inner>

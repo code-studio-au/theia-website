@@ -1,0 +1,16 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { url, formatDate } from '../lib/site';
+interface Props { post: CollectionEntry<'news'>; showDate?: boolean }
+const { post, showDate = false } = Astro.props;
+---
+<article class="news-card framed-card" data-category={post.data.category}>
+  <a href={url(`news/${post.id}/`)}>
+    <img src={url(post.data.image)} alt={post.data.imageAlt} width="550" height="196" loading="lazy" />
+    <div class="news-card-copy">
+      {showDate && <p class="metadata"><span>{post.data.category}</span> · <time datetime={post.data.date.toISOString()}>{formatDate(post.data.date)}</time></p>}
+      <h3>{post.data.title}</h3>
+      <p>{post.data.description}</p>
+    </div>
+  </a>
+</article>

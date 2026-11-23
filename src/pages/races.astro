@@ -1,0 +1,23 @@
+---
+import Inner from '../layouts/Inner.astro';
+import { url } from '../lib/site';
+const factions = [
+  { name: 'Covenant', description: 'Kingdoms, holds and ancient traditions bound within one alliance.', peoples: [
+    ['Humans', 'From the great inland plains, the Human kingdoms carry traditions of royal armies, knightly orders and structured magic. Their civilization is a unified monarchy.'],
+    ['Dwarves', 'The mountain holds honour the Shaper. Their confederation preserves traditions of craftsmanship, defensive warfare and exceptional engineering.'],
+    ['Aelari', 'A woodland elven civilization devoted to the Guardian. Life magic, protective wards and ancestral teachings shape their traditions.'],
+    ['Korrath', 'Highland trolls whose elders preserve chronicles and Keeper-linked traditions. Their ancient capital endured the Divine War.'],
+  ] },
+  { name: 'Dominion', description: 'Distinct peoples united through their own histories, faiths and ambitions.', peoples: [
+    ['Orcs', 'A confederation of Great Clans devoted to the Warrior. Professional armies, champions and varied magical traditions are part of their grassland heritage.'],
+    ['Halflings', 'A guild-governed people with roots in underground valleys. Engineering, precision and defensive mastery stand beside their devotion to the Seeker.'],
+    ['Vaelari', 'An elven civilization guided by arcane leadership and chiefly devoted to the Seeker. Research, perception and magical responsibility lie at the heart of their history.'],
+    ['Vorrath', 'An exiled troll civilization shaped by faith in the Ascendant. Religious authorities lead a people whose sacred capital stands on the storm coast.'],
+  ] },
+];
+---
+<Inner title="Choose Your Path" eyebrow="The peoples of Theia" description="Eight civilizations. Two rival alliances. A world of distinct cultures, histories and perspectives." image="images/hero.webp">
+  <p class="prose lead">A people’s history is a beginning, not the whole of an individual’s story. Martial and magical traditions take many forms within every civilization.</p>
+  {factions.map((faction) => <section><h2 class="faction-title">{faction.name === 'Covenant' && <img src={url('ui/crest.png')} alt="" width="50" height="60" />}{faction.name}</h2><p>{faction.description}</p><div class="race-list">{faction.peoples.map(([name, description]) => <article class="content-panel"><h3>{name}</h3><p>{description}</p></article>)}</div></section>)}
+  <div class="callout"><h2>Two alliances, lasting allegiances</h2><p>Covenant and Dominion are permanently opposed. Each has its own societies and stories; ordinary cross-alliance cooperation is not part of Theia’s world.</p><p class="note">This is an introduction to the planned playable peoples. Character options will be confirmed with future releases.</p></div>
+</Inner>

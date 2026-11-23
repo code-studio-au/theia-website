@@ -1,0 +1,6 @@
+---
+import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import { url } from '../lib/site';
+---
+<Base title="A Path Not Yet Travelled" noindex><section class="inner-hero" style={`--section-image:url('${url('images/world.webp')}');min-height:70vh`}><div class="inner-hero-copy"><p class="eyebrow">404 · Beyond the map</p><h1>A Path Not Yet Travelled</h1><p>This page could not be found. Let’s get you back to familiar ground.</p><div style="margin-top:30px"><Button href={url()}>Return to Theia</Button></div></div></section></Base>

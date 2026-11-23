@@ -1,0 +1,12 @@
+---
+import Inner from '../layouts/Inner.astro';
+import Button from '../components/Button.astro';
+import { site, url } from '../lib/site';
+---
+<Inner title="Your Journey Awaits" eyebrow="Play Theia Online" description="A living world is taking shape. Follow its development and prepare for your first adventure." image="images/hero.webp">
+  <div class="prose"><p class="lead">Theia Online is currently in development. Public game downloads are not available yet.</p><p>The Linux launcher is being tested with local development releases. Public hosted delivery and the Windows installer are still being prepared. News and download links will appear here when releases are ready.</p></div>
+  <div class="content-grid">
+    {(['windows', 'linux'] as const).map((platform) => <section class="content-panel"><span class="status-label">{site.downloads[platform] ? 'Available' : 'In development'}</span><h2>{platform === 'windows' ? 'Windows' : 'Linux'}</h2><p>{platform === 'windows' ? 'A Windows installer is planned. Supported versions and requirements will be confirmed with a public release.' : 'The Linux AMD64 launcher currently supports trusted local development packages. A public download will be announced when ready.'}</p>{site.downloads[platform] ? <Button primary href={site.downloads[platform]}>Download for {platform === 'windows' ? 'Windows' : 'Linux'}</Button> : <Button href={url('news/')}>Follow Development</Button>}</section>)}
+  </div>
+  <section class="prose" id="account"><h2>Your Theia account</h2><p>Sign-in and account creation take place in the game client. Website account login is not available. When public access opens, this page will explain how to install the game and begin.</p><h2>Stay close to the adventure</h2><p>Read the latest news for development progress and future availability announcements, or subscribe to the <a href={url('rss.xml')}>news feed</a>.</p></section>
+</Inner>
