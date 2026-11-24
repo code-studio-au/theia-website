@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readdir, readFile } from 'node:fs/promises';
 
-test('every page, local link and local image resolves under the GitHub Pages base path', async ({ page, request }) => {
+test('every page, local link and local image resolves under the configured base path', async ({ page, request, baseURL }) => {
   const paths = ['', 'world/', 'races/', 'story/', 'gameplay/', 'media/', 'news/', 'download/', 'about/', 'community/', 'support/', 'news/development-update/', 'news/lore-spotlight-anchors/', 'news/a-world-worth-sharing/'];
   const checked = new Set<string>();
   for (const path of paths) {
@@ -12,7 +12,7 @@ test('every page, local link and local image resolves under the GitHub Pages bas
     const links = await page.locator('a[href],img[src],link[rel="stylesheet"]').evaluateAll(elements => elements.map(el => el.getAttribute('href') || el.getAttribute('src') || ''));
     for (const link of links) {
       if (!link.startsWith('/')) continue;
-      expect(link, `base path on ${path}`).toMatch(/^\/theia-website\//);
+      expect(link.startsWith(new URL(baseURL!).pathname), `base path on ${path}: ${link}`).toBe(true);
       const target = link.split('#')[0];
       if (!checked.has(target)) { expect((await request.get(target)).status(), target).toBe(200); checked.add(target); }
     }

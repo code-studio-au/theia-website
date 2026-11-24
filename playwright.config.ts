@@ -1,7 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
 const previewPort = Number(process.env.PREVIEW_PORT || 4321);
-const previewURL = `http://127.0.0.1:${previewPort}/theia-website/`;
+const basePath = `/${(process.env.BASE_PATH ?? '/').replace(/^\/+|\/+$/g, '')}`.replace(/\/?$/, '/');
+const previewURL = `http://127.0.0.1:${previewPort}${basePath}`;
 
 export default defineConfig({
   testDir: './tests',
