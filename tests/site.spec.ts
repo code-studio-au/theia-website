@@ -45,7 +45,7 @@ test('homepage and news are built from the actual Markdown files; drafts never p
 
 test('news category filters work and restore all articles', async ({ page }) => {
   await page.goto('./news/');
-  for (const category of ['Lore', 'Development', 'Community']) {
+  for (const category of ['Lore', 'Development', 'Release Notes', 'Community']) {
     const button = page.getByRole('button', { name: category, exact: true });
     await button.click();
     await expect(button).toHaveAttribute('aria-pressed', 'true');

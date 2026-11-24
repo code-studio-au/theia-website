@@ -51,7 +51,8 @@ More details, lists and links can follow.
 ```
 
 - Put the image at `public/images/my-update.webp`. The image can be different for every post; it is not tied to the original design. Wide images around 840 × 300 work well for cards.
-- Categories: `Development`, `Lore`, `Community`.
+- Categories: `Development`, `Release Notes`, `Lore`, `Community`.
+- For a development release, use `category: Release Notes` and include the product and version in the title. Summarize what changed and say who can access the build.
 - `draft: true` excludes a post from the homepage, archive, RSS, sitemap and generated article routes.
 - Set `draft: false` and commit/push to `main` to publish. The filename becomes the URL: `/news/my-update/`.
 - Newest dates appear first. Future dates do not schedule publication; use `draft` to hold an article back.

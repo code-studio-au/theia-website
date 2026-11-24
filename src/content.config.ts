@@ -8,7 +8,7 @@ const news = defineCollection({
     title: z.string().min(1),
     description: z.string().min(1),
     date: z.coerce.date(),
-    category: z.enum(['Development', 'Lore', 'Community']),
+    category: z.enum(['Development', 'Release Notes', 'Lore', 'Community']),
     image: z.string().startsWith('images/'),
     imageAlt: z.string().min(1),
     draft: z.boolean().default(false),

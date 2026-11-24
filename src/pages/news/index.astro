@@ -5,10 +5,10 @@ import { publishedNews } from '../../lib/news';
 import { url } from '../../lib/site';
 const posts = await publishedNews();
 ---
-<Inner title="News from Theia" eyebrow="The latest from our world" description="Development updates, stories from the world, and news from the journey ahead." image="images/hero.webp">
+<Inner title="News from Theia" eyebrow="The latest from our world" description="Development updates, release notes, and stories from the world of Theia." image="images/hero.webp">
   <div class="news-toolbar">
     <div class="news-filters" role="group" aria-label="Filter news by category">
-      {['All', 'Development', 'Lore', 'Community'].map((category) => <button type="button" data-filter={category} aria-pressed={category === 'All' ? 'true' : 'false'}>{category}</button>)}
+      {['All', 'Development', 'Release Notes', 'Lore', 'Community'].map((category) => <button type="button" data-filter={category} aria-pressed={category === 'All' ? 'true' : 'false'}>{category}</button>)}
     </div>
     <a href={url('rss.xml')}>Subscribe via RSS</a>
   </div>
