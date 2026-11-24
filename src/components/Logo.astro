@@ -1,8 +1,6 @@
 ---
-import Compass from './Compass.astro';
 import { url } from '../lib/site';
 ---
 <a class="brand" href={url()} aria-label="Theia Online home">
-  <Compass class="brand-compass" />
-  <span class="brand-name">Theia<span class="brand-online">Online</span></span>
+  <img class="brand-logo" src={url('ui/theia-logo.webp')} alt="Theia Online" width="640" height="306" />
 </a>

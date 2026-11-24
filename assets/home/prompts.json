@@ -1,0 +1,76 @@
+{
+  "tool": "built-in image_gen",
+  "transparent_background": false,
+  "images": [
+    {
+      "name": "hero",
+      "prompt": "Use case: style-transfer. Image 1 is the composition/subject reference, the existing homepage hero. Image 2 is the authoritative rendering-style reference. Repaint the hero at high resolution with the same wide composition: on the LEFT a human male armoured adventurer with a dark blue cloak, a woodland elf woman and a stout dwarf man look out across a green forested mountain valley; on the RIGHT a magnificent stone castle with fine towers stands above a river and old bridges. Preserve three distinct varied back/three-quarter poses, calm anticipation, believable equipment. Mountains and sky layered into the distance. Centre is open scenic valley with calm lower-contrast sky for the website's real logo and text. Keep subjects in the middle vertical band and leave space at the bottom for four real navigation icons. Wide landscape aspect ratio approximately 2.33:1, ideally 3072x1320. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/hero.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/hero.png",
+      "web": "public/images/home/hero.webp"
+    },
+    {
+      "name": "world",
+      "prompt": "Use case: style-transfer. Image 1 is the old low-resolution world-section landscape, used as a loose subject reference only. Image 2 is the authoritative rendering-style reference. Generate a richly detailed 3:1 panoramic view of ancient weathered stone ruins in a living forested valley: broken carved arches, ivy, old bridgework over a winding river, mountain ridges and distant settlements. Main ruin architecture on the RIGHT half and middle-right, left third quieter shadowed trees and misty riverbank to support real HTML copy. No active portal, glowing magical superweapon, battles or named monuments. Explore the traces of a sophisticated lost civilization reclaimed by nature. Natural subtle warm illumination, broad atmospheric depth. High resolution ideally3072x1024. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/world.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/world.png",
+      "web": "public/images/home/world.webp"
+    },
+    {
+      "name": "races",
+      "prompt": "Use case: style-transfer. Image 1 is the old low-resolution Races card composition/subject reference. Image 2 is the authoritative rendering-style reference. Create a new high-resolution 4:3 landscape card illustration: three dignified adult fantasy characters in a balanced shoulder-up group, human man with short dark hair and medium brown skin in practical navy-and-steel attire, woodland elf woman with pointed ears and muted green clothing, sturdy dwarf man with braided russet beard and worn crafted armour. Keep their faces clearly separated, varied slight three-quarter poses, upper-centre composition so faces survive a shallow landscape crop. Natural expressions, real individual character, a softly blurred courtyard behind them. No extra figures, no costume cleavage, no oversized weapons. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/races.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/races.png",
+      "web": "public/images/home/races.webp"
+    },
+    {
+      "name": "combat",
+      "prompt": "Use case: style-transfer. Image 1 is the old low-resolution Combat card, a loose subject reference. Image 2 is the authoritative rendering-style reference. Create a new high-resolution 4:3 landscape card showing grounded tactical fantasy combat: an adult human male knight in practical worn plate and dark navy cloth, three-quarter view, shield forward and sword held ready, facing a clearly visible opposing armoured sparring fighter at the right edge. A measured encounter in a weathered stone training court, no gore or injury. Focus on intent, readable stance, weapon timing and positioning. Main fighter's head and shield in upper-centre so they survive a shallow landscape crop. Restrained sense of motion. Remove the old image's oversized orange magic swoosh; no glowing sword trail or explosive magic. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/combat.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/combat.png",
+      "web": "public/images/home/combat.webp"
+    },
+    {
+      "name": "crafting",
+      "prompt": "Use case: style-transfer. Image 1 is the old low-resolution Crafting card composition/subject reference. Image 2 is the authoritative rendering-style reference. Create a new high-resolution 4:3 landscape card of an adult woman craftsperson in a practical leather apron at a timber workbench inside a stone-and-timber workshop. She carefully works on a small crafted metal fitting with a light hammer, focused and skilled. Warm small forge behind, neatly arranged hand tools and material scraps, believable hands and practical protective clothing. Composition head, hands and workpiece in upper and central areas so the image survives a shallow landscape crop. Calm warm craftsmanship, no dramatic sparks, no modern machines. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/crafting.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/crafting.png",
+      "web": "public/images/home/crafting.webp"
+    },
+    {
+      "name": "community",
+      "prompt": "Use case: style-transfer. Image 1 is the old low-resolution Community card, a loose subject reference. Image 2 is the authoritative rendering-style reference. Create a new high-resolution 4:3 landscape card of a welcoming fantasy town square with a small group of adult travelling companions sharing a conversation at a market table, human men and women, one sturdy dwarf and one woodland elf. Varied seated and standing poses, practical adventuring clothes, casual gestures. Timber stalls, a stone fountain, blue-and-gold cloth bunting without emblems, flowers and glimpses of the lived-in town behind. A sense of companionship and everyday stories. Keep the main group clustered within the upper-centre for a shallow landscape card crop. No large festival crowd, no named event, no letters or readable signage. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/community.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/community.png",
+      "web": "public/images/home/community.webp"
+    },
+    {
+      "name": "mountains",
+      "prompt": "Use case: style-transfer. Image 1 is the old low-resolution atmospheric mountain panorama, used as a composition reference. Image 2 is the authoritative painterly finish reference. Create a high-resolution 3:1 landscape panorama of layered distant mountain ridges, pine-covered foothills and soft low clouds at dusk. Cool restrained natural slate-grey and muted blue-green tones, subtle pale warm light on a few cloud edges. No people, buildings, lettering or dramatic focal object. Quiet detailed atmospheric environment meant as a subtle backdrop around news cards. Horizon near middle height, dark natural foreground, no artificial vignette or page gradient. Match the approved Covenant-city STYLE reference: sophisticated finely detailed painterly high-fantasy illustration, believable natural materials, soft warm afternoon light, balanced exposure, restrained rich greens, warm stone, gentle atmospheric distance. Natural shadows, no artificial blue shadow wash. Avoid oversaturated orange, cartoon plastic surfaces, glaring highlights or grey gloom. Render normal art to every edge: no baked-in page fade, copy-backing, border, typography, logo, watermark or interface. This is concept artwork, not a screenshot. ",
+      "references": [
+        "public/images/mountains.webp",
+        "assets/covenant-high-city.png"
+      ],
+      "original": "assets/home/mountains.png",
+      "web": "public/images/home/mountains.webp"
+    }
+  ]
+}

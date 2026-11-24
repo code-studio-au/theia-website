@@ -1,13 +1,45 @@
 ---
-import Inner from '../layouts/Inner.astro';
+import Base from '../layouts/Base.astro';
 import { url } from '../lib/site';
 ---
-<Inner title="Play Your Way" eyebrow="Find your place in Theia" description="Exploration, tactical combat and stories that give the journey meaning." image="images/hero.webp">
-  <div class="prose"><p class="lead">Theia is being built around a classic open-world MMO experience: a world worth exploring, companions worth travelling with, and choices that matter in an encounter.</p></div>
+<Base title="Play Your Way" description="Exploration, tactical combat and stories that give the journey meaning." image="images/gameplay-background.webp">
+  <div class="gameplay-page">
+    <img class="gameplay-backdrop" src={url('images/gameplay-background.webp')} alt="" width="1536" height="1024" fetchpriority="high" />
+    <header class="gameplay-intro wrap">
+      <p class="eyebrow">Find your place in Theia</p>
+      <h1>Play Your Way</h1>
+      <div class="gameplay-summary">
+        <p class="lead">Exploration, tactical combat and stories that give the journey meaning.</p>
+        <p class="lead">Theia is being built around a classic open-world MMO experience: a world worth exploring, companions worth travelling with, and choices that matter in an encounter.</p>
+      </div>
+    </header>
+    <div class="gameplay-content wrap">
   <div class="content-grid">
-    <section class="content-panel" id="combat"><img class="panel-icon" src={url('ui/swords.png')} alt="" width="50" height="50" /><h2>Combat with intent</h2><p>Combat development focuses on selected targets, deliberate facing, weapon-timed attacks and distinct abilities. Positioning, timing and understanding your opponent shape the encounter.</p><p class="note">Ability options and balance are in development.</p></section>
-    <section class="content-panel" id="crafting"><h2>Make your mark</h2><p>Professions and crafting are part of Theia’s wider design: a place for gathered resources, craftsmanship and the cultures that shape them.</p><p class="note">Crafting is planned. Recipes, profession progression and public availability have not yet been announced.</p></section>
-    <section class="content-panel"><h2>Follow your curiosity</h2><p>The world is designed to support regional stories alongside the principal campaign. The concerns of a village or the history of a ruin can be a journey of their own.</p></section>
-    <section class="content-panel"><img class="panel-icon" src={url('ui/party.png')} alt="" width="50" height="50" /><h2>Travel together</h2><p>Party and local chat systems are part of ongoing development. The aim is a shared world where companions can meet, communicate and face its challenges together.</p></section>
+    <section class="content-panel" id="combat"><img class="panel-icon" src={url('ui/icons/combat.webp')} alt="" width="72" height="72" /><h2>Combat with intent</h2><p>Combat development focuses on selected targets, deliberate facing, weapon-timed attacks and distinct abilities. Positioning, timing and understanding your opponent shape the encounter.</p><p class="note">Ability options and balance are in development.</p></section>
+    <section class="content-panel" id="crafting"><img class="panel-icon" src={url('ui/icons/crafting.webp')} alt="" width="72" height="72" /><h2>Make your mark</h2><p>Professions and crafting are part of Theia’s wider design: a place for gathered resources, craftsmanship and the cultures that shape them.</p><p class="note">Crafting is planned. Recipes, profession progression and public availability have not yet been announced.</p></section>
+    <section class="content-panel"><img class="panel-icon" src={url('ui/icons/curiosity.webp')} alt="" width="72" height="72" /><h2>Follow your curiosity</h2><p>The world is designed to support regional stories alongside the principal campaign. The concerns of a village or the history of a ruin can be a journey of their own.</p></section>
+    <section class="content-panel"><img class="panel-icon" src={url('ui/icons/together.webp')} alt="" width="72" height="72" /><h2>Travel together</h2><p>Party and local chat systems are part of ongoing development. The aim is a shared world where companions can meet, communicate and face its challenges together.</p></section>
   </div>
-</Inner>
+    </div>
+  </div>
+</Base>
+
+<style>
+  .gameplay-page { position: relative; isolation: isolate; overflow: clip; }
+  .gameplay-backdrop { position: absolute; z-index: -2; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; mask-image: linear-gradient(to bottom, transparent, #000 14%, #000 78%, transparent); pointer-events: none; }
+  .gameplay-page::before { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(to bottom, #0005, #0002 38%, #0003 75%, transparent); pointer-events: none; }
+  .gameplay-intro { padding-block: 56px 28px; text-align: center; text-shadow: 0 2px 6px #000; }
+  .gameplay-intro h1 { font-family: var(--display); font-size: clamp(36px, 5vw, 62px); line-height: 1.15; color: #ffdda0; margin-bottom: 18px; }
+  .gameplay-intro .lead { max-width: 760px; margin-inline: auto; }
+  .gameplay-summary { max-width: 900px; margin-inline: auto; padding: 12px 20px; background: linear-gradient(to right, transparent, #0009 50%, transparent); }
+  .gameplay-summary .lead + .lead { margin-top: 24px; line-height: 1.65; }
+  .gameplay-content { padding-bottom: 64px; }
+  .content-panel { background: #031725df; box-shadow: 0 8px 28px #0003; }
+  .content-panel .panel-icon { width: 72px; height: 72px; object-fit: contain; margin-bottom: 16px; }
+  @media (max-width: 600px) {
+    .gameplay-intro { padding-block: 40px 22px; }
+    .gameplay-backdrop { height: 900px; }
+    .content-panel .panel-icon { width: 64px; height: 64px; }
+    .gameplay-content { padding-bottom: 40px; }
+  }
+</style>

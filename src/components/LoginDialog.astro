@@ -1,0 +1,98 @@
+---
+import { url } from '../lib/site';
+---
+<dialog id="login-dialog" aria-labelledby="login-title" aria-describedby="login-status">
+  <div class="login-panel">
+    <button class="login-close" type="button" aria-label="Close login dialog" autofocus>×</button>
+    <img class="login-logo" src={url('ui/theia-logo.webp')} alt="Theia Online" width="640" height="306" />
+    <p class="eyebrow">Your next adventure awaits</p>
+    <h2 id="login-title">Welcome back</h2>
+    <p id="login-status">Website sign-in is coming soon. For now, sign in through the game client.</p>
+    <form>
+      <fieldset disabled aria-describedby="login-status">
+        <legend class="login-visually-hidden">Sign in to your Theia account</legend>
+        <label for="login-username">Username</label>
+        <input id="login-username" type="text" autocomplete="username" placeholder="Your username" />
+        <label for="login-password">Password</label>
+        <input id="login-password" type="password" autocomplete="current-password" placeholder="Your password" />
+        <button class="login-submit" type="submit">Log In</button>
+      </fieldset>
+    </form>
+    <p class="login-help">New to Theia? <a href={url('download/')}>Getting started</a></p>
+  </div>
+</dialog>
+
+<style>
+  :global(html:has(#login-dialog[open])) { overflow: hidden; }
+  dialog {
+    width: min(460px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    margin: auto;
+    padding: 0;
+    overflow-y: auto;
+    color: var(--white);
+    background: radial-gradient(ellipse at top, #173c50, #041b2a 55%, #03131f);
+    border: 1px solid #b99555;
+    box-shadow: 0 24px 90px #000a, inset 0 0 35px #0004;
+  }
+  dialog::backdrop { background: #000b; backdrop-filter: blur(5px); }
+  .login-panel { position: relative; padding: 30px 36px 28px; text-align: center; }
+  .login-close { position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; background: transparent; color: var(--gold); font-size: 30px; line-height: 1; }
+  .login-close:hover { background: #ffffff0a; }
+  .login-logo { width: 190px; height: auto; margin: 0 auto 22px; }
+  .eyebrow { font-size: 11px; letter-spacing: 2px; margin-bottom: 10px; }
+  h2 { font-family: var(--display); font-size: 30px; line-height: 1.2; color: var(--gold); margin-bottom: 14px; }
+  #login-status { color: var(--muted); font-size: 17px; line-height: 1.4; }
+  form { margin-top: 24px; text-align: left; }
+  fieldset { margin: 0; padding: 0; border: 0; min-width: 0; }
+  label { display: block; color: #e8d4ae; font-size: 17px; margin-bottom: 6px; }
+  input { display: block; width: 100%; min-height: 44px; padding: 10px 12px; margin-bottom: 18px; border: 1px solid #8a7757; border-radius: 2px; background: #02111ccc; color: var(--white); font-size: 17px; }
+  input::placeholder { color: #a0acb2; opacity: 1; }
+  input:disabled { opacity: .75; cursor: not-allowed; }
+  .login-submit { width: 100%; min-height: 46px; margin-top: 2px; border: 1px solid #a2834e; background: linear-gradient(#59451f, #352a15); color: #d8c29a; font-family: var(--display); font-size: 18px; cursor: not-allowed; }
+  .login-help { margin-top: 22px; font-size: 16px; color: var(--muted); }
+  .login-help a { color: var(--gold); text-decoration: underline; text-underline-offset: 3px; }
+  .login-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  @media (max-width: 400px) {
+    .login-panel { padding: 28px 22px 24px; }
+    .login-logo { width: 170px; }
+    h2 { font-size: 27px; }
+  }
+</style>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#login-dialog');
+  let opener: HTMLElement | null = null;
+  document.querySelectorAll<HTMLElement>('[data-login-open]').forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      if (!dialog || dialog.open) return;
+      opener = trigger;
+      dialog.showModal();
+    });
+  });
+  dialog?.querySelector('.login-close')?.addEventListener('click', () => dialog.close());
+  dialog?.addEventListener('keydown', event => {
+    if (event.key !== 'Tab') return;
+    const controls = Array.from(dialog.querySelectorAll<HTMLElement>('a[href], button:not(:disabled), input:not(:disabled), [tabindex="0"]'));
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  });
+  dialog?.addEventListener('click', event => {
+    if (event.target !== dialog) return;
+    const rect = dialog.getBoundingClientRect();
+    if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dialog.close();
+  });
+  dialog?.addEventListener('close', () => {
+    const target = opener?.getClientRects().length ? opener : document.querySelector<HTMLElement>('.menu-toggle');
+    target?.focus();
+  });
+  // Authentication is not connected; never navigate or submit credentials.
+  dialog?.querySelector('form')?.addEventListener('submit', event => event.preventDefault());
+</script>

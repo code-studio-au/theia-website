@@ -22,6 +22,8 @@ npm run preview
 
 **News is real Markdown content, not part of a background image.** Every file in `src/content/news/` becomes an article. The homepage automatically shows the three newest published entries. The news archive, categories and RSS feed use the same collection.
 
+Article artwork spans the full page width with soft top and bottom fades. This is the shared style for every news post; use a high-resolution landscape image (around 3:1) with room for cropping on mobile and ultrawide screens.
+
 Create a draft:
 
 ```sh
@@ -59,11 +61,11 @@ More details, lists and links can follow.
 
 ## GitHub Pages deployment
 
-The deployment workflow is `.github/workflows/deploy.yml`. It installs Node from `.nvmrc`, runs `npm ci`, checks Astro/TypeScript, builds static HTML and uploads `dist/` using GitHub Pages artifacts. Pull requests build without deploying; pushes to `main` deploy.
+The deployment workflow is `.github/workflows/deploy.yml`. It installs Node from `.nvmrc`, runs `npm ci`, checks Astro/TypeScript, builds static HTML and uploads `dist/` using GitHub Pages artifacts. Pull requests build without deploying. Deployment is disabled until the repository Actions variable `ENABLE_PAGES` is set to `true`; after that, pushes to `main` deploy.
 
 Destination: `https://code-studio-au.github.io/theia-website/`.
 
-Repository **Settings → Pages → Build and deployment → Source** must be **GitHub Actions**. No credentials belong in the source tree; deployments use the workflow's limited `GITHUB_TOKEN` permissions.
+To enable publication, configure **Settings → Pages → Build and deployment → Source** as **GitHub Actions**, then create the repository Actions variable `ENABLE_PAGES` with value `true`. Until publication is configured, pushes only build and save an artifact. No credentials belong in the source tree; deployments use the workflow's limited `GITHUB_TOKEN` permissions.
 
 `astro.config.mjs` sets the Pages site and base path. All shared links, images, canonical URLs and the RSS feed respect that base. For a custom domain, set `site` to its origin and `base` to `/`, configure the domain in GitHub Pages, and add the corresponding `public/CNAME` file. Local overrides are available as `SITE_URL` and `BASE_PATH`.
 
@@ -72,7 +74,7 @@ Repository **Settings → Pages → Build and deployment → Source** must be **
 - Homepage: `src/pages/index.astro`.
 - World, races, story, gameplay and other static pages: `src/pages/`.
 - Download links and shared metadata: `src/lib/site.ts`. Set `downloads.windows` and/or `downloads.linux` to verified HTTPS releases when public packages exist. Until then, the download page accurately shows development status.
-- The header's Log In link explains client sign-in on the download page. There is no fake web login or password form.
+- The header's Log In button (also available in the mobile menu) opens `src/components/LoginDialog.astro`. Website authentication is not connected: fields and submission are disabled, and the dialog explains client sign-in. Connect a verified authentication service before enabling the form; it currently sends and stores no credentials.
 - Source references and artwork provenance: [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), [docs/ASSETS.md](docs/ASSETS.md).
 
 ## Browser validation
@@ -82,7 +84,7 @@ npm run build
 npm test
 ```
 
-Tests use an installed Chrome (`/usr/bin/google-chrome`, or set `CHROME_PATH`) through Playwright. They check static routes, local links/assets under the Pages subpath, Markdown article output, news filters, responsive overflow, mobile navigation and axe accessibility. Screenshots are saved to ignored `test-results/`. Browser tests are local; the deployment workflow runs the type/content checks and production build.
+Tests use an installed Chrome (`/usr/bin/google-chrome`, or set `CHROME_PATH`) through Playwright. Set `PREVIEW_PORT` to an unused port if the default test port 4321 is occupied. They check static routes, local links/assets under the Pages subpath, Markdown article output, news filters, responsive overflow, mobile navigation and axe accessibility. Screenshots are saved to ignored `test-results/`. Browser tests are local; the deployment workflow runs the type/content checks and production build.
 
 ## Rendering references
 

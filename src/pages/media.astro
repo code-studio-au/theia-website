@@ -1,9 +1,13 @@
 ---
 import Inner from '../layouts/Inner.astro';
 import { url } from '../lib/site';
-const images = [['hero', 'Beyond the horizon'], ['world', 'The ruins of an older world'], ['story', 'The mystery of the Anchors']];
+const images = [['home/hero', 'Beyond the horizon'], ['world', 'The ruins of an older world'], ['story/anchor-mystery', 'The mystery of the Anchors'], ['world-map-alliances', 'Theia: Covenant, Dominion and the Shroud']];
 ---
 <Inner title="Visions of Theia" eyebrow="Art & atmosphere" description="A glimpse of the world we imagine, from distant kingdoms to the echoes of ancient wonders.">
   <p class="note" style="margin-bottom:25px">Website concept artwork, adapted with AI from the supplied visual direction. These illustrations are not in-game screenshots. Select an image to view it.</p>
-  <div class="gallery">{images.map(([name, title]) => <figure><a href={url(`images/${name}.webp`)} aria-label={`View ${title}`}><img src={url(`images/${name}.webp`)} alt={title} width="1024" height={name === 'hero' ? 440 : 214} loading="lazy" /></a><figcaption>{title} · Concept artwork</figcaption></figure>)}</div>
+  <div class="gallery">{images.map(([name, title]) => <figure class:list={{ 'map-artwork': name === 'world-map-alliances' }}><a href={url(`images/${name}.webp`)} aria-label={`View ${title}`}><img src={url(`images/${name}.webp`)} alt={title} width="1024" height={name === 'world-map-alliances' ? 1024 : name === 'home/hero' ? 440 : 214} loading="lazy" /></a><figcaption>{title} · Concept artwork</figcaption></figure>)}</div>
 </Inner>
+
+<style>
+  .map-artwork img { object-fit: contain; }
+</style>

@@ -1,17 +1,84 @@
 ---
-import Inner from '../layouts/Inner.astro';
+import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import { url } from '../lib/site';
+
+const chapters = [
+  {
+    id: 'age-of-wonders',
+    title: 'The Age of Wonders',
+    text: 'In the Divine Age, extraordinary magical civilizations flourished. Great orders studied the workings of the world, archives gathered their discoveries, and ancient passageways connected distant places. Knowledge travelled with scholars, who exchanged ideas across cultures and could question even divine teachings. Magic was a subject of patient study as well as wonder, woven into achievements that later generations would struggle to understand. The ruins that remain offer only glimpses of that sophistication: fragments of a world whose greatest accomplishments have outlived the knowledge needed to recreate them.',
+  },
+  {
+    id: 'world-changed',
+    title: 'A world changed',
+    text: 'The Divine War devastated those civilizations. Knowledge was lost, passageways were broken, and generations of migration reshaped the world. Survivors carried what they could into new homes: skills, beliefs, memories and accounts of the lives they had left behind. The events remembered through the Sunderings became part of histories that do not always agree. As new societies grew, each preserved different pieces of the past. An abandoned crossing, a weathered monument or an old tradition may tell a story that the surviving chronicles remember very differently.',
+  },
+  {
+    id: 'anchor-mystery',
+    title: 'The mystery of the Anchors',
+    text: 'Old mechanisms are more than monuments to the past. Strange disturbances and unfamiliar devices raise questions that ordinary explanations cannot settle. A surviving fragment may invite study, but recognising its age is not the same as understanding its purpose. Following these traces means listening carefully, comparing accounts and weighing evidence against assumptions. It also means asking who benefits when knowledge stays hidden. The mystery of the Anchors unfolds through those uncertain connections, where a local discovery can challenge beliefs that have endured for generations.',
+  },
+  {
+    id: 'heartlands',
+    title: 'Begin with the Heartlands',
+    text: 'The Human campaign starts with the lives of people in Millhaven and the surrounding Heartlands. Farmers tend their fields, tradespeople keep their workshops running, and travellers carry news between settlements. A troubled road, a missing shipment or a witness’s account can lead to something larger, but each concern first matters to the people living with it. From village paths to the river crossing at Stoneford, the journey begins with familiar responsibilities and uncertain answers. Beyond the principal campaign, local histories and everyday struggles give the world stories of its own.',
+  },
+];
 ---
-<Inner title="A Deeper Story" eyebrow="What the past left behind" description="Ancient wonders. Conflicting histories. A mystery that begins close to home." image="images/story.webp">
-  <div class="prose">
-    <p class="lead">The people of Theia live among the remnants of an age they no longer fully understand. Their histories disagree. Their ruins hold fragments of forgotten knowledge. And something is stirring beneath familiar ground.</p>
-    <h2>The Age of Wonders</h2><p>In the Divine Age, extraordinary magical civilizations flourished. Great orders studied the workings of the world, archives gathered their discoveries, and ancient passageways connected distant places. Mortal scholars could question even divine teachings.</p>
-    <h2>A world changed</h2><p>The Divine War devastated those civilizations. Knowledge was lost, passageways were broken, and generations of migration reshaped the world. The events remembered through the Sunderings left the modern peoples with partial—and often conflicting—accounts of what came before.</p>
-    <h2>The mystery of the Anchors</h2><p>Old mechanisms are more than monuments to the past. Strange disturbances and unfamiliar devices raise questions that ordinary explanations cannot settle. Following their traces means listening carefully, weighing evidence and discovering who benefits when knowledge stays hidden.</p>
-    <h2>Begin with the Heartlands</h2><p>The Human campaign starts with the lives of people in Millhaven and the surrounding Heartlands. A troubled road, a missing shipment or a witness’s account can lead to something larger. But the world has stories worth discovering even beyond the principal campaign.</p>
+<Base title="A Deeper Story" description="Ancient wonders. Conflicting histories. A mystery that begins close to home." image="images/story.webp">
+  <header class="story-intro" style={`--story-image: url('${url('images/story.webp')}')`}>
+    <div class="wrap">
+      <p class="eyebrow">What the past left behind</p>
+      <h1>A Deeper Story</h1>
+      <p class="subtitle">Ancient wonders. Conflicting histories. A mystery that begins close to home.</p>
+      <p class="lead">The people of Theia live among the remnants of an age they no longer fully understand. Their histories disagree. Their ruins hold fragments of forgotten knowledge. And something is stirring beneath familiar ground.</p>
+    </div>
+  </header>
+  {chapters.map((chapter, index) => <section class:list={['story-chapter', { 'copy-right': index % 2 === 1 }]} aria-labelledby={chapter.id} style={`--story-image: url('${url(`images/story/${chapter.id}.webp`)}')`}>
+    <div class="wrap chapter-inner">
+      <div class="chapter-copy">
+        <h2 id={chapter.id}>{chapter.title}</h2>
+        <p>{chapter.text}</p>
+      </div>
+    </div>
+  </section>)}
+  <div class="story-outro wrap">
     <blockquote><p>The past does not speak with one voice. Which stories will you believe?</p></blockquote>
     <p class="note">A spoiler-light introduction to the planned story. Campaign content is still in development.</p>
     <Button href={url('news/lore-spotlight-anchors/')}>Read the Anchor Spotlight</Button>
   </div>
-</Inner>
+</Base>
+
+<style>
+  .story-intro, .story-chapter { position: relative; isolation: isolate; }
+  .story-intro::before, .story-chapter::before { content: ''; position: absolute; z-index: -1; inset: 0; pointer-events: none; background-position: center; background-size: cover; mask-image: linear-gradient(to bottom, transparent, #000 20%, #000 74%, transparent); }
+  .story-intro { padding-block: 64px 56px; text-align: center; }
+  .story-intro::before { background-image: linear-gradient(#031725b8, #031725dd), var(--story-image); }
+  .story-intro h1 { font-family: var(--display); font-size: clamp(36px, 5vw, 62px); line-height: 1.15; color: #ffdda0; margin-bottom: 18px; }
+  .subtitle { max-width: 680px; margin-inline: auto; font-size: 22px; }
+  .story-intro .lead { max-width: 800px; margin: 28px auto 0; font-size: 21px; line-height: 1.55; }
+  .story-chapter { display: flex; align-items: center; min-height: clamp(440px, 34vw, 560px); padding-block: 76px; }
+  .story-chapter::before { background-image: linear-gradient(to right, #031725e6, #031725bf 38%, #03172533 70%, #03172511), var(--story-image); }
+  .story-chapter.copy-right::before { background-image: linear-gradient(to left, #031725e6, #031725bf 38%, #03172533 70%, #03172511), var(--story-image); }
+  .chapter-copy { max-width: 550px; text-shadow: 0 2px 5px #000, 0 0 20px #031725; }
+  .copy-right .chapter-copy { margin-left: auto; }
+  .chapter-copy h2 { font-family: var(--display); font-size: clamp(27px, 2.6vw, 36px); line-height: 1.25; color: var(--gold); margin-bottom: 20px; }
+  .chapter-copy p { font-size: 21px; line-height: 1.6; }
+  .story-outro { padding-block: 32px 70px; text-align: center; }
+  .story-outro blockquote { max-width: 800px; margin: 0 auto 22px; color: var(--gold); font-size: 25px; font-style: italic; }
+  .story-outro .note { margin-bottom: 24px; }
+  @media (max-width: 900px) {
+    .chapter-copy { max-width: 510px; }
+    .story-chapter::before, .story-chapter.copy-right::before { background-image: linear-gradient(#031725aa, #031725d9), var(--story-image); }
+  }
+  @media (max-width: 600px) {
+    .story-intro { padding-block: 40px; }
+    .subtitle, .story-intro .lead { font-size: 20px; }
+    .story-chapter { min-height: 0; padding-block: 64px; }
+    .chapter-copy p { font-size: 20px; }
+    .story-chapter::before { background-position: 65% center; }
+    .story-chapter.copy-right::before { background-position: 35% center; }
+    .story-outro { padding-block: 24px 48px; }
+  }
+</style>

@@ -78,6 +78,24 @@ test('desktop and mobile layouts have no overflow or serious accessibility viola
   }
 });
 
+test('World artwork stays within the page on ultrawide displays', async ({ page }) => {
+  for (const width of [3440, 2560, 1920]) {
+    await page.setViewportSize({ width, height: 1440 });
+    await page.goto('./world/');
+    await page.evaluate(() => document.fonts.ready);
+    await page.locator('.world-backdrop').evaluate((image: HTMLImageElement) => image.decode());
+    const layout = await page.evaluate(() => {
+      const art = document.querySelector('.world-backdrop')!.getBoundingClientRect();
+      const world = document.querySelector('.world-page')!.getBoundingClientRect();
+      const footer = document.querySelector('.site-footer')!.getBoundingClientRect();
+      return { artBottom: art.bottom, worldBottom: world.bottom, footerBottom: footer.bottom, pageBottom: document.documentElement.scrollHeight, pageWidth: document.documentElement.scrollWidth };
+    });
+    expect(layout.artBottom, `art contained at ${width}px`).toBeLessThanOrEqual(layout.worldBottom + 1);
+    expect(Math.abs(layout.pageBottom - layout.footerBottom), `no artwork below footer at ${width}px`).toBeLessThanOrEqual(1);
+    expect(layout.pageWidth).toBeLessThanOrEqual(width);
+  }
+});
+
 test('mobile menu opens, closes with Escape and navigates', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('./');
@@ -89,4 +107,45 @@ test('mobile menu opens, closes with Escape and navigates', async ({ page }) => 
   await toggle.click();
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'World', exact: true }).click();
   await expect(page).toHaveURL(/\/world\/$/);
+});
+
+test('login dialog opens, keeps focus inside, and closes on desktop and mobile', async ({ page }) => {
+  for (const width of [1440, 390, 320]) {
+    await page.setViewportSize({ width, height: width === 320 ? 568 : 900 });
+    await page.goto('./');
+    const mobile = width < 600;
+    const menu = page.locator('.menu-toggle');
+    const trigger = page.locator(mobile ? '.mobile-login' : '.login-link');
+    const open = async () => {
+      if (mobile) await menu.click();
+      await trigger.click();
+    };
+    await open();
+    const dialog = page.getByRole('dialog', { name: 'Welcome back' });
+    await expect(dialog).toBeVisible();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
+    await expect(dialog.getByLabel('Username', { exact: true })).toBeDisabled();
+    await expect(dialog.getByLabel('Password', { exact: true })).toBeDisabled();
+    await expect(dialog.getByRole('button', { name: 'Log In', exact: true })).toBeDisabled();
+    const close = dialog.getByRole('button', { name: 'Close login dialog' });
+    await expect(close).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(dialog.getByRole('link', { name: 'Getting started' })).toBeFocused();
+    const bounds = await dialog.boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0);
+    expect(bounds!.width).toBeLessThanOrEqual(width);
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
+    expect(axe.violations).toEqual([]);
+    await page.screenshot({ path: `test-results/login-${width}.png` });
+    await page.keyboard.press('Escape');
+    await expect(dialog).not.toBeVisible();
+    await expect(mobile ? menu : trigger).toBeFocused();
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe('hidden');
+    await open();
+    await close.click();
+    await expect(dialog).not.toBeVisible();
+    await open();
+    await page.mouse.click(2, 2);
+    await expect(dialog).not.toBeVisible();
+  }
 });

@@ -3,8 +3,8 @@ title: 'Lore Spotlight: The Anchors'
 description: Ancient structures and their dangerous echoes.
 date: 2026-11-22
 category: Lore
-image: images/news-anchors.webp
-imageAlt: Fantasy concept art of a luminous blue crystal surrounded by ancient ruins
+image: images/story/anchor-mystery.webp
+imageAlt: Fantasy concept art of a golden crystal suspended within bronze rings in a ruined chamber
 draft: false
 ---
 

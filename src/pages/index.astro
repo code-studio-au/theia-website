@@ -1,17 +1,16 @@
 ---
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
-import Compass from '../components/Compass.astro';
 import SectionTitle from '../components/SectionTitle.astro';
 import NewsCard from '../components/NewsCard.astro';
 import { url } from '../lib/site';
 import { publishedNews } from '../lib/news';
 const posts = (await publishedNews()).slice(0, 3);
 const pillars = [
-  { title: 'Explore', description: 'Vast, connected lands', icon: '', path: 'world/' },
-  { title: 'Quest', description: 'A rich, story-driven world', icon: 'swords', path: 'story/' },
-  { title: 'Choose', description: 'Unique races and paths', icon: 'party', path: 'races/' },
-  { title: 'Progress', description: 'Build your hero, your way', icon: 'experience', path: 'gameplay/' },
+  { title: 'Explore', description: 'Vast, connected lands', icon: 'explore', path: 'world/' },
+  { title: 'Quest', description: 'A rich, story-driven world', icon: 'quest', path: 'story/' },
+  { title: 'Choose', description: 'Unique races and paths', icon: 'choose', path: 'races/' },
+  { title: 'Progress', description: 'Build your hero, your way', icon: 'progress', path: 'gameplay/' },
 ];
 const features = [
   { title: 'Races', description: 'Distinct cultures, histories and perspectives.', image: 'races', path: 'races/' },
@@ -20,22 +19,25 @@ const features = [
   { title: 'Community', description: 'Find your companions. Share the journey.', image: 'community', path: 'community/' },
 ];
 ---
-<Base home>
-  <section class="hero ornate-rule" style={`--section-image: url('${url('images/hero.webp')}')`} aria-labelledby="hero-title">
+<Base home image="images/home/hero.webp">
+  <section class="hero ornate-rule" style={`--section-image: url('${url('images/home/hero.webp')}')`} aria-labelledby="hero-title">
     <div class="hero-copy">
-      <h1 id="hero-title"><span>Explore the world of</span><strong>Theia</strong></h1>
+      <h1 id="hero-title">
+        <span>Explore the world of</span>
+        <img class="hero-logo" src={url('ui/theia-logo.webp')} alt="Theia Online" width="640" height="306" />
+      </h1>
       <p>A living world of adventure, conflict and ancient secrets</p>
       <div class="small-ornament" aria-hidden="true">◇</div>
-      <Button primary href={url('download/')} class="hero-cta">Play Free</Button>
+      <Button primary href={url('download/')} class="hero-cta">Play Now</Button>
     </div>
     <div class="hero-pillars wrap">
       {pillars.map((pillar) => <a href={url(pillar.path)}>
-        {pillar.icon ? <img src={url(`ui/${pillar.icon}.png`)} alt="" width="42" height="42" /> : <Compass class="pillar-compass" />}
+        <img src={url(`ui/icons/${pillar.icon}.webp`)} alt="" width="56" height="56" />
         <h2>{pillar.title}</h2><p>{pillar.description}</p>
       </a>)}
     </div>
   </section>
-  <section class="world-section ornate-rule" style={`--section-image: url('${url('images/world.webp')}')`} aria-labelledby="world-title">
+  <section class="world-section ornate-rule" style={`--section-image: url('${url('images/home/world.webp')}')`} aria-labelledby="world-title">
     <SectionTitle title="The World of Theia" id="world-title" />
     <div class="wrap"><div class="world-copy"><p>A vast world shaped by ancient powers, shattered realms and the lingering scars of the Sundering. Explore diverse regions, meet memorable allies and uncover the truths that still lie hidden.</p><Button href={url('world/')}>Explore the World <span aria-hidden="true">›</span></Button></div></div>
   </section>
@@ -43,17 +45,22 @@ const features = [
     <SectionTitle title="Play Your Way" id="play-title" />
     <div class="feature-grid wrap">
       {features.map((feature) => <a class="feature-card framed-card" href={url(feature.path)}>
-        <img src={url(`images/${feature.image}.webp`)} alt="" width="209" height="155" loading="lazy" />
+        <img src={url(`images/home/${feature.image}.webp`)} alt="" width="800" height="600" loading="lazy" />
         <div><h3>{feature.title}</h3><p>{feature.description}</p></div>
       </a>)}
     </div>
   </section>
-  <section class="story-section ornate-rule" style={`--section-image: url('${url('images/story.webp')}')`} aria-labelledby="story-title">
+  <section class="story-section ornate-rule" style={`--section-image: url('${url('images/story/anchor-mystery.webp')}')`} aria-labelledby="story-title">
     <div class="wrap"><div class="story-copy"><h2 id="story-title">A Deeper Story</h2><p>Uncover the mystery of the Anchors, the truths of the Sundering, and the forces that still seek to reshape Theia.</p><Button href={url('story/')}>Discover the Story <span aria-hidden="true">›</span></Button></div></div>
   </section>
-  <section class="news-section" style={`--mountains: url('${url('images/mountains.webp')}')`} aria-labelledby="news-title">
+  <section class="news-section" style={`--mountains: url('${url('images/home/mountains.webp')}')`} aria-labelledby="news-title">
     <SectionTitle title="Latest News" id="news-title" />
     <div class="news-grid wrap">{posts.map((post) => <NewsCard post={post} />)}</div>
     <a class="all-news" href={url('news/')}>View all news <span aria-hidden="true">›</span></a>
   </section>
 </Base>
+
+<style>
+  .hero-pillars img { width: 56px; height: 56px; object-fit: contain; }
+  @media (max-width: 600px) { .hero-pillars img { width: 44px; height: 44px; } }
+</style>

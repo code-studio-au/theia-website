@@ -1,23 +1,92 @@
 ---
-import Inner from '../layouts/Inner.astro';
+import Base from '../layouts/Base.astro';
 import { url } from '../lib/site';
 const factions = [
-  { name: 'Covenant', description: 'Kingdoms, holds and ancient traditions bound within one alliance.', peoples: [
-    ['Humans', 'From the great inland plains, the Human kingdoms carry traditions of royal armies, knightly orders and structured magic. Their civilization is a unified monarchy.'],
-    ['Dwarves', 'The mountain holds honour the Shaper. Their confederation preserves traditions of craftsmanship, defensive warfare and exceptional engineering.'],
-    ['Aelari', 'A woodland elven civilization devoted to the Guardian. Life magic, protective wards and ancestral teachings shape their traditions.'],
-    ['Korrath', 'Highland trolls whose elders preserve chronicles and Keeper-linked traditions. Their ancient capital endured the Divine War.'],
+  { name: 'Covenant', image: 'images/covenant-high-city.webp', description: 'Kingdoms, holds and ancient traditions bound within one alliance.', peoples: [
+    ['Humans', 'From the great inland plains, the Human kingdoms carry traditions of royal armies, knightly orders and structured magic. Their civilization is a unified monarchy.', 'human'],
+    ['Dwarves', 'The mountain holds honour the Shaper. Their confederation preserves traditions of craftsmanship, defensive warfare and exceptional engineering.', 'dwarf'],
+    ['Aelari', 'A woodland elven civilization devoted to the Guardian. Life magic, protective wards and ancestral teachings shape their traditions.', 'aelari'],
+    ['Korrath', 'Highland trolls whose elders preserve chronicles and Keeper-linked traditions. Their ancient capital endured the Divine War.', 'korrath'],
   ] },
-  { name: 'Dominion', description: 'Distinct peoples united through their own histories, faiths and ambitions.', peoples: [
-    ['Orcs', 'A confederation of Great Clans devoted to the Warrior. Professional armies, champions and varied magical traditions are part of their grassland heritage.'],
-    ['Halflings', 'A guild-governed people with roots in underground valleys. Engineering, precision and defensive mastery stand beside their devotion to the Seeker.'],
-    ['Vaelari', 'An elven civilization guided by arcane leadership and chiefly devoted to the Seeker. Research, perception and magical responsibility lie at the heart of their history.'],
-    ['Vorrath', 'An exiled troll civilization shaped by faith in the Ascendant. Religious authorities lead a people whose sacred capital stands on the storm coast.'],
+  { name: 'Dominion', image: 'images/dominion-high-city.webp', description: 'Distinct peoples united through their own histories, faiths and ambitions.', peoples: [
+    ['Orcs', 'A confederation of Great Clans devoted to the Warrior. Professional armies, champions and varied magical traditions are part of their grassland heritage.', 'orc'],
+    ['Halflings', 'A guild-governed people with roots in underground valleys. Engineering, precision and defensive mastery stand beside their devotion to the Seeker.', 'halfling'],
+    ['Vaelari', 'An elven civilization guided by arcane leadership and chiefly devoted to the Seeker. Research, perception and magical responsibility lie at the heart of their history.', 'vaelari'],
+    ['Vorrath', 'An exiled troll civilization shaped by faith in the Ascendant. Religious authorities lead a people whose sacred capital stands on the storm coast.', 'vorrath'],
   ] },
 ];
 ---
-<Inner title="Choose Your Path" eyebrow="The peoples of Theia" description="Eight civilizations. Two rival alliances. A world of distinct cultures, histories and perspectives." image="images/hero.webp">
-  <p class="prose lead">A people’s history is a beginning, not the whole of an individual’s story. Martial and magical traditions take many forms within every civilization.</p>
-  {factions.map((faction) => <section><h2 class="faction-title">{faction.name === 'Covenant' && <img src={url('ui/crest.png')} alt="" width="50" height="60" />}{faction.name}</h2><p>{faction.description}</p><div class="race-list">{faction.peoples.map(([name, description]) => <article class="content-panel"><h3>{name}</h3><p>{description}</p></article>)}</div></section>)}
-  <div class="callout"><h2>Two alliances, lasting allegiances</h2><p>Covenant and Dominion are permanently opposed. Each has its own societies and stories; ordinary cross-alliance cooperation is not part of Theia’s world.</p><p class="note">This is an introduction to the planned playable peoples. Character options will be confirmed with future releases.</p></div>
-</Inner>
+<Base title="Choose Your Path" description="Eight civilizations. Two rival alliances. A world of distinct cultures, histories and perspectives." image="images/covenant-high-city.webp">
+  <header class="races-intro wrap">
+    <p class="eyebrow">The peoples of Theia</p>
+    <h1>Choose Your Path</h1>
+    <p class="lead">Eight civilizations. Two rival alliances. A world of distinct cultures, histories and perspectives.</p>
+    <p>A people’s history is a beginning, not the whole of an individual’s story. Martial and magical traditions take many forms within every civilization.</p>
+    <nav class="alliance-selector" aria-label="Choose an alliance">
+      {factions.map((faction) => <a href={`#${faction.name.toLowerCase()}`}>
+        <img src={url(faction.name === 'Covenant' ? 'ui/crest.png' : 'ui/dominion-crest.webp')} alt="" width="36" height="40" />
+        <span>{faction.name}</span>
+      </a>)}
+    </nav>
+  </header>
+  <div class="factions">
+    {factions.map((faction) => <section class="faction-section" aria-labelledby={faction.name.toLowerCase()} style={`--faction-image: url('${url(faction.image)}')`}>
+      <div class="faction-heading wrap">
+        <h2 class="faction-title" id={faction.name.toLowerCase()} tabindex="-1"><img src={url(faction.name === 'Covenant' ? 'ui/crest.png' : 'ui/dominion-crest.webp')} alt="" width={faction.name === 'Covenant' ? 50 : 60} height="60" />{faction.name}</h2>
+        <p>{faction.description}</p>
+      </div>
+      <div class="race-list wrap">{faction.peoples.map(([name, description, portrait]) => <article class="content-panel">
+        <div class="race-portrait"><img src={url(`images/races/${portrait}.webp`)} alt={`Illustrative ${name} character portrait`} width="640" height="640" loading="lazy" decoding="async" /></div>
+        <div class="race-copy"><h3>{name}</h3><p>{description}</p></div>
+      </article>)}</div>
+    </section>)}
+  </div>
+  <div class="races-outro wrap"><div class="callout"><h2>Two alliances, lasting allegiances</h2><p>Covenant and Dominion are permanently opposed. Each has its own societies and stories; ordinary cross-alliance cooperation is not part of Theia’s world.</p><p class="note">This is an introduction to the planned playable peoples. Character options will be confirmed with future releases.</p></div></div>
+</Base>
+
+<style>
+  .races-intro { padding-block: 52px 24px; text-align: center; }
+  .races-intro h1 { font-family: var(--display); font-size: clamp(36px, 5vw, 62px); color: #ffdda0; line-height: 1.15; margin-bottom: 18px; }
+  .races-intro > p:not(.eyebrow) { max-width: 760px; margin-inline: auto; }
+  .races-intro > .lead + p { margin-top: 16px; color: var(--muted); }
+  .alliance-selector { display: flex; justify-content: center; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+  .alliance-selector a { display: flex; align-items: center; justify-content: center; gap: 16px; min-width: 250px; padding: 14px 32px; border: 1px solid #b9955580; background: #092536; color: var(--gold); font-family: var(--display); font-size: 22px; transition: background .2s, border-color .2s; }
+  .alliance-selector a:hover { background: #12364b; border-color: var(--gold); }
+  .alliance-selector img { width: 72px; height: 84px; object-fit: contain; flex-shrink: 0; }
+  .factions { display: grid; grid-auto-rows: 1fr; }
+  .faction-section { position: relative; isolation: isolate; display: flex; flex-direction: column; justify-content: space-between; gap: 180px; min-height: clamp(680px, 50vw, 900px); padding-block: 64px 72px; }
+  /* Fade only the artwork, keeping the copy and crests fully opaque. */
+  .faction-section::before { content: ''; position: absolute; z-index: -1; inset: 0; background: linear-gradient(180deg, #03172555, transparent 38%, #03172555), var(--faction-image) center / cover no-repeat; mask-image: linear-gradient(to bottom, transparent, #000 18%, #000 70%, transparent); pointer-events: none; }
+  .faction-heading { text-align: center; text-shadow: 0 2px 5px #000, 0 0 22px #031725; }
+  .faction-title { justify-content: center; font-size: clamp(30px, 3vw, 44px); margin: 0 0 12px; scroll-margin-top: 40px; }
+  .faction-title img { height: 100px; width: auto; flex-shrink: 0; }
+  .faction-title:focus-visible { outline: 2px solid var(--gold); outline-offset: 8px; }
+  .faction-heading > p { max-width: 900px; margin-inline: auto; padding: 8px 20px; font-size: 21px; background: linear-gradient(to right, transparent, #0009 50%, transparent); }
+  .race-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; }
+  .content-panel { padding: 0; overflow: hidden; background: #031725e8; border-color: #b995555c; box-shadow: 0 8px 30px #00101b40; }
+  .race-portrait { background: radial-gradient(ellipse at 50% 55%, #31506566, transparent 72%); }
+  .race-portrait img { width: 100%; height: auto; aspect-ratio: 1; object-fit: contain; mask-image: linear-gradient(to bottom, #000 75%, transparent 100%); }
+  .race-copy { position: relative; padding: 0 24px 24px; }
+  .content-panel p { line-height: 1.45; }
+  .races-outro { padding-bottom: 64px; }
+  .races-outro .callout { margin-top: 0; }
+  @media (max-width: 1000px) {
+    .race-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .faction-section { gap: 140px; padding-block: 48px; }
+  }
+  @media (max-width: 600px) {
+    .races-intro { padding-block: 38px 12px; }
+    .races-intro .lead { font-size: 21px; }
+    .alliance-selector { gap: 10px; }
+    .alliance-selector a { flex: 1; flex-direction: column; min-width: 0; gap: 8px; padding: 14px 12px; font-size: 17px; }
+    .alliance-selector img { width: 56px; height: 64px; }
+    .faction-title img { height: 76px; }
+    .factions { grid-auto-rows: auto; }
+    .faction-section { gap: 180px; padding-block: 40px; }
+    .faction-section::before { bottom: auto; height: 620px; background-position: 47% center; }
+    .faction-heading > p { font-size: 19px; }
+    .race-list { grid-template-columns: 1fr; gap: 14px; }
+    .race-copy { padding: 0 22px 22px; }
+    .races-outro { padding-bottom: 40px; }
+  }
+</style>

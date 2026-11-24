@@ -3,7 +3,7 @@ export const site = {
   description: 'Explore a living world of adventure, conflict and ancient secrets. Discover the world, peoples and stories of Theia Online.',
   repository: 'https://github.com/code-studio-au/theia-mmo',
   // Add verified public URLs when hosted game distribution is available.
-  downloads: { windows: '', linux: '' },
+  downloads: { windows: '', macos: '', linux: '' },
 };
 
 export function url(path = ''): string {

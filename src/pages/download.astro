@@ -2,11 +2,48 @@
 import Inner from '../layouts/Inner.astro';
 import Button from '../components/Button.astro';
 import { site, url } from '../lib/site';
+const platforms = [
+  { id: 'windows', name: 'Windows', status: 'Planned', description: 'A Windows installer is planned. Supported versions and requirements will be confirmed with a public release.' },
+  { id: 'linux', name: 'Linux', status: 'In development', description: 'The Linux AMD64 launcher currently supports trusted local development packages. A public download will be announced when ready.' },
+  { id: 'macos', name: 'Mac', status: 'Planned', description: 'A macOS version is planned. Supported Mac models and system requirements will be confirmed with a future release.' },
+] as const;
 ---
 <Inner title="Your Journey Awaits" eyebrow="Play Theia Online" description="A living world is taking shape. Follow its development and prepare for your first adventure." image="images/hero.webp">
-  <div class="prose"><p class="lead">Theia Online is currently in development. Public game downloads are not available yet.</p><p>The Linux launcher is being tested with local development releases. Public hosted delivery and the Windows installer are still being prepared. News and download links will appear here when releases are ready.</p></div>
-  <div class="content-grid">
-    {(['windows', 'linux'] as const).map((platform) => <section class="content-panel"><span class="status-label">{site.downloads[platform] ? 'Available' : 'In development'}</span><h2>{platform === 'windows' ? 'Windows' : 'Linux'}</h2><p>{platform === 'windows' ? 'A Windows installer is planned. Supported versions and requirements will be confirmed with a public release.' : 'The Linux AMD64 launcher currently supports trusted local development packages. A public download will be announced when ready.'}</p>{site.downloads[platform] ? <Button primary href={site.downloads[platform]}>Download for {platform === 'windows' ? 'Windows' : 'Linux'}</Button> : <Button href={url('news/')}>Follow Development</Button>}</section>)}
+  <div class="content-grid platform-grid">
+    {platforms.map((platform) => <section class:list={["content-panel", { "linux-platform": platform.id === "linux" }]}>
+      <span class="status-label">{platform.id === 'linux' && site.downloads.linux ? 'Available' : platform.status}</span>
+      <h2>{platform.name}</h2>
+      <p>{platform.description}</p>
+      {platform.id === 'linux' && site.downloads.linux
+        ? <Button primary href={site.downloads.linux}>Download Launcher</Button>
+        : <button class:list={['button', 'launcher-button', { 'button-primary': platform.id === 'linux' }]} type="button" disabled={platform.id !== 'linux'} data-launcher-unavailable={platform.id === 'linux' ? '' : undefined}><span>Download Launcher</span></button>}
+      {platform.id === 'linux' && <p class="note launcher-status" id="linux-download-status" role="status"></p>}
+    </section>)}
   </div>
-  <section class="prose" id="account"><h2>Your Theia account</h2><p>Sign-in and account creation take place in the game client. Website account login is not available. When public access opens, this page will explain how to install the game and begin.</p><h2>Stay close to the adventure</h2><p>Read the latest news for development progress and future availability announcements, or subscribe to the <a href={url('rss.xml')}>news feed</a>.</p></section>
+  <section class="prose"><h2>Stay close to the adventure</h2><p>Read the latest news for development progress and future availability announcements, or subscribe to the <a href={url('rss.xml')}>news feed</a>.</p></section>
 </Inner>
+
+<style>
+  .platform-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .linux-platform {
+    border-color: #c8a263;
+    background: radial-gradient(ellipse at top, #b78a3420, transparent 70%), linear-gradient(135deg, #103246, #061f2e);
+    box-shadow: 0 0 20px #c99a3814;
+  }
+  .linux-platform .status-label { color: #ffe2a1; border-color: #b99555; background: #b9955514; }
+  .launcher-button { border: 0; color: inherit; font-family: inherit; }
+  .launcher-button:disabled { opacity: .45; cursor: not-allowed; }
+  .launcher-button:disabled:hover { filter: none; }
+  .launcher-status:empty { display: none; }
+  .launcher-status:not(:empty) { margin-top: 14px; }
+  @media (max-width: 900px) {
+    .platform-grid { grid-template-columns: 1fr; }
+  }
+</style>
+
+<script>
+  document.querySelector('[data-launcher-unavailable]')?.addEventListener('click', () => {
+    const status = document.querySelector('#linux-download-status');
+    if (status) status.textContent = 'The Linux launcher download is not available yet. Please check back soon.';
+  });
+</script>

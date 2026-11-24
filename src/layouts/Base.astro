@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Logo from '../components/Logo.astro';
 import Button from '../components/Button.astro';
+import LoginDialog from '../components/LoginDialog.astro';
 import { site, url } from '../lib/site';
 interface Props { title?: string; description?: string; image?: string; home?: boolean; noindex?: boolean }
 const { title, description = site.description, image = 'images/hero.webp', home = false, noindex = false } = Astro.props;
@@ -27,7 +28,7 @@ const active = (path: string) => path ? Astro.url.pathname.startsWith(url(path))
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL(url(image), Astro.site)} />
     <meta name="twitter:card" content="summary_large_image" />
-    {home && <link rel="preload" as="image" href={url('images/hero.webp')} />}
+    {home && <link rel="preload" as="image" href={url(image)} />}
     <title>{documentTitle}</title>
   </head>
   <body class:list={{ 'home-page': home }}>
@@ -38,11 +39,13 @@ const active = (path: string) => path ? Astro.url.pathname.startsWith(url(path))
         <button class="menu-toggle" aria-expanded="false" aria-controls="primary-navigation" aria-label="Open navigation"><span></span><span></span><span></span></button>
         <nav id="primary-navigation" aria-label="Main navigation">
           {nav.map(([label, path]) => <a href={url(path)} aria-current={active(path) ? 'page' : undefined}>{label}</a>)}
+          <button class="mobile-login" type="button" data-login-open aria-haspopup="dialog" aria-controls="login-dialog">Log In</button>
         </nav>
-        <div class="header-actions"><a class="login-link" href={url('download/#account')}><svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="10" cy="5" r="3.2"/><path d="M3 18v-3a7 7 0 0 1 14 0v3Z"/></svg>Log In</a><Button primary href={url('download/')}>Play Free</Button></div>
+        <div class="header-actions"><button class="login-link" type="button" data-login-open aria-haspopup="dialog" aria-controls="login-dialog"><svg viewBox="0 0 20 20" width="16" height="16" fill="currentColor" aria-hidden="true"><circle cx="10" cy="5" r="3.2"/><path d="M3 18v-3a7 7 0 0 1 14 0v3Z"/></svg>Log In</button><Button primary href={url('download/')}>Play Now</Button></div>
       </div>
     </header>
     <main id="main"><slot /></main>
+    <LoginDialog />
     <footer class="site-footer ornate-rule">
       <div class="footer-inner">
         <Logo />
@@ -57,7 +60,7 @@ const active = (path: string) => path ? Astro.url.pathname.startsWith(url(path))
       function closeMenu() { toggle?.setAttribute('aria-expanded', 'false'); toggle?.setAttribute('aria-label', 'Open navigation'); nav?.classList.remove('is-open'); }
       toggle?.addEventListener('click', () => { const open = toggle.getAttribute('aria-expanded') !== 'true'; toggle.setAttribute('aria-expanded', String(open)); toggle.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation'); nav?.classList.toggle('is-open', open); });
       document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') { closeMenu(); toggle.focus(); } });
-      nav?.addEventListener('click', (event) => { if ((event.target as HTMLElement).closest('a')) closeMenu(); });
+      nav?.addEventListener('click', (event) => { if ((event.target as HTMLElement).closest('a, [data-login-open]')) closeMenu(); });
       window.matchMedia('(min-width: 901px)').addEventListener('change', closeMenu);
     </script>
   </body>
