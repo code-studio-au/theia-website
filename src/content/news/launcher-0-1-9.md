@@ -1,21 +1,26 @@
 ---
 title: Launcher 0.1.9
 slug: auto-launcher-0-1-9
-description: Install and update the signed Linux client, then sign in to the Sydney development realm when invited.
+description: Direct tester sign-in, smaller client updates, and on-demand operation for the Sydney realm.
 date: 2026-11-25T10:40:52Z
 category: Release Notes
 image: images/covenant-high-city.webp
 imageAlt: Concept art of the Covenant capital above its harbour
 ---
 
-Launcher **0.1.9** is available as a Linux AMD64 installer on the Development channel.
+## Launcher
 
-## Installing and updating
+- Add direct Cognito sign-in for invited testers and keep browser sign-in available.
+- Verify the signed client manifest and reuse unchanged files. Use a binary patch when one is available for a changed file.
 
-Download the launcher, open it, and choose **Install Game**. The launcher verifies the signed release and checks the files it installs. On subsequent updates it reuses unchanged files from your installation. A changed file can use a smaller patch when one is available.
+## Infrastructure
 
-## Signing in to Sydney
+- Enable on-demand startup and automatic idle shutdown for the Sydney development realm. Save pending progress before shutting the server down.
+- Give gateway deployments dedicated AWS permissions and scope API stage tagging to the Sydney gateway.
 
-Invited testers use the Sydney realm configuration supplied for the playtest. Select **Play** and sign in with your tester account. The launcher supports signing in directly and offers browser sign-in when needed. After sign-in, choose a character from your saved roster to enter Millhaven.
+## Release workflow
+
+- Publish Linux downloads on GitHub Pages and verify the live launcher and client executable.
+- Import signed release entries into the public News page and RSS feed.
 
 [Go to downloads](../../download/)
