@@ -90,7 +90,12 @@ References: [VentraIP DNS management](https://ventraip.com.au/support-centre/add
 
 - Homepage: `src/pages/index.astro`.
 - World, races, story, gameplay and other static pages: `src/pages/`.
-- Download links and shared metadata: `src/lib/site.ts`. Set `downloads.windows` and/or `downloads.linux` to verified HTTPS releases when public packages exist. Until then, the download page accurately shows development status.
+- Download links and shared metadata: `src/lib/site.ts`. The Linux link uses a stable URL on the separate `theia-mmo` Pages project.
+  After the first game download release passes its live verification, set the
+  website Actions variable `ENABLE_LINUX_DOWNLOADS` to `true` and dispatch its
+  Pages workflow. The workflow verifies the live launcher and update feed
+  before replacing the website. With the variable unset, the Linux download
+  stays unavailable.
 - The header's Log In button (also available in the mobile menu) opens `src/components/LoginDialog.astro`. Website authentication is not connected: fields and submission are disabled, and the dialog explains client sign-in. Connect a verified authentication service before enabling the form; it currently sends and stores no credentials.
 - Source references and artwork provenance: [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), [docs/ASSETS.md](docs/ASSETS.md).
 

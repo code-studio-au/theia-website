@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASTRO_TELEMETRY_DISABLED: '1'
+      PUBLIC_LINUX_DOWNLOADS: ${{ vars.ENABLE_LINUX_DOWNLOADS }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -27,6 +28,15 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - name: Verify Linux downloads before website deployment
+        if: github.event_name != 'pull_request' && vars.ENABLE_PAGES == 'true' && vars.ENABLE_LINUX_DOWNLOADS == 'true'
+        run: |
+          base=https://code-studio-au.github.io/theia-mmo/downloads
+          for path in development.json theia-launcher_amd64.deb; do
+            status=$(curl --silent --show-error --head --retry 3 --max-time 20 \
+              --output /dev/null --write-out '%{http_code}' "$base/$path")
+            [[ "$status" == 200 ]] || { echo "Missing live Linux download: $path ($status)" >&2; exit 1; }
+          done
       - run: npm run build
       - uses: actions/upload-pages-artifact@v5
         with:
