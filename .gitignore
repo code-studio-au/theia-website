@@ -7,3 +7,7 @@ dist/
 test-results/
 playwright-report/
 .DS_Store
+
+# Generated from the signed release-news archive during the website build.
+src/content/news/auto-client-*.md
+src/content/news/auto-launcher-*.md

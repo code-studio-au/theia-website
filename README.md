@@ -60,6 +60,23 @@ More details, lists and links can follow.
 - The `news:new` helper refuses to overwrite an existing post and validates the filename.
 - Markdown links between posts can use `../other-post/`. Root-relative Markdown links start at `/` for this deployment, for example `/world/`.
 
+## Automatic release notes
+
+After the first verified game download release, set the website repository
+variable `THEIA_RELEASE_PUBLIC_KEY` to the game release signing public key
+in base64 DER form. Set `ENABLE_RELEASE_NEWS=true` and dispatch
+**Build and deploy to GitHub Pages** once. The workflow imports the signed
+release archive from the fixed game Pages origin. Earlier releases remain in
+the archive. A hand-written `client-<version>.md` or `launcher-<version>.md`
+(with dots replaced by hyphens) takes precedence over a generated post.
+Generated posts are build files and are included in the news page and RSS.
+
+To trigger later website builds automatically, configure the game publishing
+workflow to dispatch this website workflow after it verifies a live release.
+The website needs the public key only. See the
+[game publishing runbook](https://github.com/code-studio-au/theia-mmo/blob/main/docs/GAME_LAUNCHER.md)
+for the website-only Actions credential and manual retry.
+
 ## GitHub Pages deployment
 
 The deployment workflow is `.github/workflows/deploy.yml`. It installs Node from `.nvmrc`, runs `npm ci`, checks Astro/TypeScript, builds static HTML and uploads `dist/` using GitHub Pages artifacts. Pull requests build without deploying. Deployment is disabled until the repository Actions variable `ENABLE_PAGES` is set to `true`; after that, pushes to `main` deploy.
