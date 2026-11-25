@@ -19,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASTRO_TELEMETRY_DISABLED: '1'
+      PUBLIC_LINUX_DOWNLOADS: ${{ vars.ENABLE_LINUX_DOWNLOADS }}
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -26,7 +27,26 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      - run: node --test scripts/test-import-release-news.mjs
+      - name: Verify and import the published release notes
+        if: github.event_name != 'pull_request' && vars.ENABLE_PAGES == 'true' && vars.ENABLE_RELEASE_NEWS == 'true'
+        env:
+          THEIA_RELEASE_PUBLIC_KEY: ${{ vars.THEIA_RELEASE_PUBLIC_KEY }}
+        run: |
+          base=https://code-studio-au.github.io/theia-mmo/downloads
+          curl --fail --silent --show-error --retry 3 --max-time 30 --max-filesize 1048576 \
+            "$base/release-news.json?build=$GITHUB_RUN_ID" --output "$RUNNER_TEMP/release-news.json"
+          node scripts/import-release-news.mjs "$RUNNER_TEMP/release-news.json"
       - run: npm run check
+      - name: Verify Linux downloads before website deployment
+        if: github.event_name != 'pull_request' && vars.ENABLE_PAGES == 'true' && vars.ENABLE_LINUX_DOWNLOADS == 'true'
+        run: |
+          base=https://code-studio-au.github.io/theia-mmo/downloads
+          for path in development.json theia-launcher_amd64.deb; do
+            status=$(curl --silent --show-error --head --retry 3 --max-time 20 \
+              --output /dev/null --write-out '%{http_code}' "$base/$path")
+            [[ "$status" == 200 ]] || { echo "Missing live Linux download: $path ($status)" >&2; exit 1; }
+          done
       - run: npm run build
       - uses: actions/upload-pages-artifact@v5
         with:

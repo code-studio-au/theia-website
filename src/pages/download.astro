@@ -4,7 +4,9 @@ import Button from '../components/Button.astro';
 import { site, url } from '../lib/site';
 const platforms = [
   { id: 'windows', name: 'Windows', status: 'Planned', description: 'A Windows installer is planned. Supported versions and requirements will be confirmed with a public release.' },
-  { id: 'linux', name: 'Linux', status: 'In development', description: 'The Linux AMD64 launcher currently supports trusted local development packages. A public download will be announced when ready.' },
+  { id: 'linux', name: 'Linux', status: 'In development', description: site.downloads.linux
+    ? 'Install the Linux AMD64 launcher to download and update the game.'
+    : 'The Linux AMD64 launcher currently supports trusted local development packages. A public download will be announced when ready.' },
   { id: 'macos', name: 'Mac', status: 'Planned', description: 'A macOS version is planned. Supported Mac models and system requirements will be confirmed with a future release.' },
 ] as const;
 ---

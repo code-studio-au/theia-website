@@ -2,8 +2,13 @@ export const site = {
   name: 'Theia Online',
   description: 'Explore a living world of adventure, conflict and ancient secrets. Discover the world, peoples and stories of Theia Online.',
   repository: 'https://github.com/code-studio-au/theia-mmo',
-  // Add verified public URLs when hosted game distribution is available.
-  downloads: { windows: '', macos: '', linux: '' },
+  downloads: {
+    windows: '',
+    macos: '',
+    linux: import.meta.env.PUBLIC_LINUX_DOWNLOADS === 'true'
+      ? 'https://code-studio-au.github.io/theia-mmo/downloads/theia-launcher_amd64.deb'
+      : '',
+  },
 };
 
 export function url(path = ''): string {
