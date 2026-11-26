@@ -1,4 +1,4 @@
-// Older notes and server releases that are outside the signed client archive.
+// Historical notes and deployed builds outside the signed download archive.
 export const developmentDetails = [
   { product: 'launcher', version: '0.1.3', date: '2026-11-24T00:00:00Z', notes: [
     'Separate launcher updates from client updates and preserve the installed game and settings through restart.',
@@ -35,6 +35,28 @@ export const developmentDetails = [
     'Start Theia on demand and shut it down after idle time, with a persistence flush before shutdown.',
     'Scope deployment permissions to the realm gateway and validate build compatibility before accepting a join.',
     'Activate the full Theia playtest profile with NPC contacts, enemy loot, quests, inventory, progression, chat and parties.',
-    'Add website account setup, email recovery and optional authenticator MFA for invited players.',
+    'Configure Cognito for invite-only accounts, verified email recovery and optional authenticator MFA.',
+  ] },
+  { product: 'website', version: '59ac2cd', date: '2026-11-24T01:19:42Z', notes: [
+    'Publish Theia Online on its own HTTPS domain with illustrated world and faction pages, a media gallery, and news.',
+  ] },
+  { product: 'website', version: '25c61f6', date: '2026-11-24T09:58:40Z', notes: [
+    'Add a Release Notes category for development builds.',
+  ] },
+  { product: 'website', version: '5d8e9fd', date: '2026-11-25T10:30:40Z', notes: [
+    'Link the Linux download to the verified installer and import signed release notes into News and RSS.',
+  ] },
+  { product: 'website', version: '95389cf', date: '2026-11-25T22:35:13Z', notes: [
+    'Use concise changelogs that cover player-facing, infrastructure and release workflow changes.',
+  ] },
+  { product: 'website', version: '374bf3b', date: '2026-11-26T04:00:24Z', notes: [
+    'Combine recent releases into one weekly Development Update.',
+    'Add a themed account flow for playtest invitations, recovery email verification, password resets and optional authenticator setup.',
+  ] },
+  { product: 'website', version: 'b83393f', date: '2026-11-26T05:08:52Z', notes: [
+    'Show account setup completion once. Send returning testers to an account overview with their setup and game approval status.',
+  ] },
+  { product: 'website', version: '53382db', date: '2026-11-26T05:17:27Z', notes: [
+    'Use the gold action style for account submissions and themed text links for Reset password, Back, Skip and Sign out.',
   ] },
 ];

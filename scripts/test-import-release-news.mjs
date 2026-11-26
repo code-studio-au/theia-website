@@ -43,7 +43,7 @@ test('signed release news is repeatable, escapes notes, and preserves manual pos
   assert.equal(await readFile(join(folder, 'auto-launcher-0-1-8.md'), 'utf8'), post);
 });
 
-test('groups builds and server updates in Sydney calendar weeks', async t => {
+test('groups builds, server updates and website changes in Sydney calendar weeks', async t => {
   const folder = await mkdtemp(join(tmpdir(), 'theia-weekly-news-'));
   t.after(() => rm(folder, { recursive: true, force: true }));
   const { key, signed } = signedNewsFixture();
@@ -56,6 +56,8 @@ test('groups builds and server updates in Sydney calendar weeks', async t => {
   const details = [
     { product: 'server', version: 'realm-1', date: '2026-11-23T00:00:00Z', notes: ['Hosted playtest'] },
     { product: 'server', version: 'realm-2', date: '2026-11-26T00:00:00Z', notes: ['Idle shutdown'] },
+    { product: 'website', version: '9bcdef0', date: '2026-11-26T00:00:00Z', notes: ['Account overview'] },
+    { product: 'website', version: '123abc4', date: '2026-11-23T00:00:00Z', notes: ['Playtest downloads'] },
     { ...entries[1], notes: ['Qualified the Linux export'] },
   ];
   await writeFile(join(folder, 'auto-launcher-0-1-3.md'), 'old generated post');
@@ -65,5 +67,6 @@ test('groups builds and server updates in Sydney calendar weeks', async t => {
   assert.match(post, /## Launcher\n\n\*\*0\.1\.3 → 0\.1\.11\*\*\n\n- Improved downloads\n- Launcher updates\n- Updated account panel/);
   assert.match(post, /## Client\n\n\*\*0\.1\.0\.15\*\*\n\n- Quest journal\n- Qualified the Linux export/);
   assert.match(post, /## Server\n\n\*\*realm-1 → realm-2\*\*\n\n- Hosted playtest\n- Idle shutdown/);
+  assert.match(post, /## Website\n\n\*\*123abc4 → 9bcdef0\*\*\n\n- Playtest downloads\n- Account overview/);
   assert.doesNotMatch(post, /Next week/);
 });

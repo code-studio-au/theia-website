@@ -97,10 +97,10 @@ function weeklyArticle(week, entries) {
   const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date)
     || a.version.localeCompare(b.version, 'en', { numeric: true }));
   const fields = { title: `Development Update — ${WEEK_TITLE.format(new Date(week))}`,
-    description: 'This week’s Launcher, Client and Server changes for Theia.',
+    description: 'This week’s Launcher, Client, Server and Website changes for Theia.',
     date: sorted.at(-1).date, category: 'Development', image: STYLE.client[1], imageAlt: STYLE.client[2] };
   const header = Object.entries(fields).map(([key, value]) => `${key}: ${JSON.stringify(value)}`).join('\n');
-  const sections = [['launcher', 'Launcher'], ['client', 'Client'], ['server', 'Server']].map(([product, name]) => {
+  const sections = [['launcher', 'Launcher'], ['client', 'Client'], ['server', 'Server'], ['website', 'Website']].map(([product, name]) => {
     const releases = sorted.filter(entry => entry.product === product);
     if (!releases.length) return `## ${name}\n\nNo builds recorded this week.`;
     const first = releases[0].version;
