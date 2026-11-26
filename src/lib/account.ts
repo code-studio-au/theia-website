@@ -12,6 +12,24 @@ import { toDataURL } from 'qrcode';
 type View = 'sign-in' | 'new-password' | 'sign-in-code' | 'email' | 'email-code'
   | 'security' | 'totp' | 'complete' | 'profile' | 'reset' | 'reset-code';
 
+type RosterCharacter = {
+  name: string;
+  level: number | null;
+  total_xp: number | null;
+  last_saved_unix: number;
+};
+
+function isRosterCharacter(entry: unknown): entry is RosterCharacter {
+  if (!entry || typeof entry !== 'object') return false;
+  const { name, level, total_xp, last_saved_unix } = entry as Partial<RosterCharacter>;
+  return typeof name === 'string' && name.length >= 3 && name.length <= 20
+    && ((level === null && total_xp === null)
+      || (typeof level === 'number' && Number.isSafeInteger(level) && level > 0
+        && typeof total_xp === 'number' && Number.isSafeInteger(total_xp) && total_xp >= 0))
+    && typeof last_saved_unix === 'number' && Number.isSafeInteger(last_saved_unix)
+    && Number.isFinite(new Date(last_saved_unix * 1000).getTime());
+}
+
 const errors: Record<string, string> = {
   CodeMismatchException: 'That code was not accepted. Check it and try again.',
   ExpiredCodeException: 'That code expired. Request a new code or start again.',
@@ -24,7 +42,7 @@ const errors: Record<string, string> = {
 };
 
 export function startAccountPage(root: HTMLElement) {
-  const { pool, client, accountUrl, profileUrl } = root.dataset;
+  const { pool, client, accountUrl, profileUrl, rosterUrl } = root.dataset;
   if (!pool || !client || !accountUrl || !profileUrl) return;
   Amplify.configure({ Auth: { Cognito: { userPoolId: pool, userPoolClientId: client } } });
   cognitoUserPoolsTokenProvider.setKeyValueStorage(sharedInMemoryStorage);
@@ -38,6 +56,19 @@ export function startAccountPage(root: HTMLElement) {
   const profileSetup = root.querySelector<HTMLElement>('[data-account-setup]')!;
   const profileAccess = root.querySelector<HTMLElement>('[data-game-access]')!;
   const profileAuthenticator = root.querySelector<HTMLElement>('[data-profile-authenticator]')!;
+  const profileMfa = root.querySelector<HTMLElement>('[data-mfa-status]')!;
+  const profileDownload = root.querySelector<HTMLElement>('[data-profile-download]')!;
+  const pageTitle = document.querySelector<HTMLHeadingElement>('.inner-hero h1')!;
+  const signInTitle = pageTitle.textContent;
+  const rosterStatus = root.querySelector<HTMLElement>('[data-roster-status]')!;
+  const rosterLayout = root.querySelector<HTMLElement>('[data-roster-layout]')!;
+  const roster = root.querySelector<HTMLUListElement>('[data-roster]')!;
+  const characterName = root.querySelector<HTMLElement>('[data-selected-character]')!;
+  const characterLevel = root.querySelector<HTMLElement>('[data-character-level]')!;
+  const characterXp = root.querySelector<HTMLElement>('[data-character-xp]')!;
+  const characterSaved = root.querySelector<HTMLTimeElement>('[data-character-saved]')!;
+  const statNumber = new Intl.NumberFormat('en-AU');
+  const savedDate = new Intl.DateTimeFormat('en-AU', { dateStyle: 'medium' });
   const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement;
   let view: View = 'sign-in';
   let busy = false;
@@ -47,6 +78,7 @@ export function startAccountPage(root: HTMLElement) {
   let completingSetup = false;
   let totpVerified = false;
   let totpDuringSignIn = false;
+  let rosterRequest: AbortController | undefined;
 
   function status(text: string) {
     message.textContent = text;
@@ -55,11 +87,21 @@ export function startAccountPage(root: HTMLElement) {
 
   function show(next: View, focus = true) {
     view = next;
+    const viewingProfile = next === 'profile';
+    root.classList.toggle('is-profile', viewingProfile);
+    pageTitle.textContent = viewingProfile ? 'Account overview' : signInTitle;
     for (const panel of views) panel.hidden = panel.dataset.view !== next;
     startOver.hidden = next === 'sign-in' || next === 'complete' || next === 'profile';
     startOver.textContent = location.pathname === profileUrl ? 'Back to account' : 'Back to account setup';
     status('');
-    if (focus) root.querySelector<HTMLElement>(`[data-view="${next}"] h2`)?.focus();
+    if (focus) {
+      if (viewingProfile) {
+        pageTitle.tabIndex = -1;
+        pageTitle.focus();
+      } else {
+        root.querySelector<HTMLElement>(`[data-view="${next}"] h2`)?.focus();
+      }
+    }
   }
 
   function clearSetupKey() {
@@ -79,12 +121,91 @@ export function startAccountPage(root: HTMLElement) {
     clearSetupKey();
     completingSetup = false;
     username = resetUser = email = '';
-    profileName.textContent = profileSetup.textContent = profileAccess.textContent = '';
+    profileName.textContent = profileSetup.textContent = profileAccess.textContent = profileMfa.textContent = '';
     profileAuthenticator.hidden = true;
+    profileDownload.hidden = true;
+    clearRoster();
     for (const form of root.querySelectorAll<HTMLFormElement>('form')) form.reset();
     await signOut();
     if (location.pathname === profileUrl) history.replaceState(null, '', accountUrl);
     show('sign-in');
+  }
+
+  function clearRoster() {
+    rosterRequest?.abort();
+    rosterRequest = undefined;
+    roster.replaceChildren();
+    rosterLayout.hidden = true;
+    characterName.textContent = '';
+    characterLevel.textContent = '';
+    characterXp.textContent = '';
+    characterSaved.textContent = '';
+    characterSaved.removeAttribute('datetime');
+    rosterStatus.textContent = '';
+  }
+
+  function showCharacter(character: RosterCharacter) {
+    characterName.textContent = character.name;
+    characterLevel.textContent = character.level === null ? 'Unavailable' : statNumber.format(character.level);
+    characterXp.textContent = character.total_xp === null ? 'Unavailable' : statNumber.format(character.total_xp);
+    const lastSaved = new Date(character.last_saved_unix * 1000);
+    characterSaved.dateTime = lastSaved.toISOString();
+    characterSaved.textContent = savedDate.format(lastSaved);
+  }
+
+  function showCharacters(characters: RosterCharacter[]) {
+    const choices = characters.map((character, index) => {
+      const item = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.textContent = character.name;
+      button.setAttribute('aria-pressed', String(index === 0));
+      button.addEventListener('click', () => {
+        for (const choice of choices) choice.setAttribute('aria-pressed', String(choice === button));
+        showCharacter(character);
+      });
+      item.append(button);
+      roster.append(item);
+      return button;
+    });
+    showCharacter(characters[0]);
+    rosterLayout.hidden = false;
+    rosterStatus.textContent = '';
+  }
+
+  async function loadRoster(approved: boolean, token: string) {
+    clearRoster();
+    const offline = 'Characters are available when Theia is online.';
+    if (!approved || !rosterUrl) {
+      rosterStatus.textContent = approved ? offline : 'Characters are available to approved playtesters.';
+      return;
+    }
+    const request = new AbortController();
+    rosterRequest = request;
+    const timeout = setTimeout(() => request.abort(), 5000);
+    rosterStatus.textContent = 'Loading characters…';
+    try {
+      const response = await fetch(rosterUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+        credentials: 'omit', cache: 'no-store', redirect: 'error', signal: request.signal,
+      });
+      if (!response.ok) throw new Error('Character roster unavailable');
+      const { characters } = await response.json();
+      if (!Array.isArray(characters) || characters.length > 8 || !characters.every(isRosterCharacter)) {
+        throw new Error('Invalid character roster');
+      }
+      if (rosterRequest !== request) return;
+      if (!characters.length) {
+        rosterStatus.textContent = 'Create your first character in Theia.';
+        return;
+      }
+      showCharacters(characters);
+    } catch {
+      if (rosterRequest === request) rosterStatus.textContent = offline;
+    } finally {
+      clearTimeout(timeout);
+      if (rosterRequest === request) rosterRequest = undefined;
+    }
   }
 
   async function showProfile() {
@@ -96,13 +217,18 @@ export function startAccountPage(root: HTMLElement) {
     }
     const claims = tokens.accessToken.payload;
     const groups = claims['cognito:groups'];
+    const approved = Array.isArray(groups) && groups.includes('theia-testers');
     const preference = await fetchMFAPreference();
     profileName.textContent = typeof claims.username === 'string' ? claims.username : username;
     profileSetup.textContent = 'Complete';
-    profileAccess.textContent = Array.isArray(groups) && groups.includes('theia-testers') ? 'Approved' : 'Unapproved';
-    profileAuthenticator.hidden = preference.enabled?.includes('TOTP') ?? false;
+    profileAccess.textContent = approved ? 'Approved' : 'Unapproved';
+    const mfaEnabled = preference.enabled?.includes('TOTP') ?? false;
+    profileMfa.textContent = mfaEnabled ? 'Enabled' : 'Off';
+    profileAuthenticator.hidden = mfaEnabled;
+    profileDownload.hidden = !approved;
     history.replaceState(null, '', profileUrl);
     show('profile');
+    void loadRoster(approved, tokens.accessToken.toString());
   }
 
   async function chooseAuthenticator() {
