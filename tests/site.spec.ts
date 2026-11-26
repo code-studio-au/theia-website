@@ -132,7 +132,7 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
         return fill ? getComputedStyle(fill).backgroundImage : '';
       }))).toEqual(Array(await accountActions.count()).fill(playNowFill));
       const linkActions = page.locator('[data-account] button:not(.button-primary)');
-      expect(await linkActions.allTextContents()).toEqual(['Skip for now', 'Sign out', 'Back to account setup']);
+      expect(await linkActions.allTextContents()).toEqual(['Reset password', 'Skip for now', 'Sign out', 'Back to account setup']);
       for (const link of await linkActions.all()) {
         await expect(link).toHaveCSS('text-decoration-line', 'underline');
         await expect(link).toHaveCSS('background-image', 'none');
