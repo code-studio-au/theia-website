@@ -1,0 +1,111 @@
+---
+import Inner from '../layouts/Inner.astro';
+import { url } from '../lib/site';
+const pool = import.meta.env.PUBLIC_THEIA_ACCOUNT_POOL_ID ?? '';
+const client = import.meta.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID ?? '';
+const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$/.test(client);
+---
+<Inner title="Your Theia account" eyebrow="Playtest access" description="Set up an invited account, add an authenticator, or recover your password.">
+  <section class="account" data-account data-pool={configured ? pool : undefined} data-client={configured ? client : undefined} aria-label="Account setup and recovery">
+    <p data-unavailable>Account setup is currently unavailable. <a href={url('support/')}>Get help</a>.</p>
+    <p class="account-message" data-message aria-live="polite" hidden></p>
+    <section data-view="sign-in" hidden>
+      <h2 tabindex="-1">Set up your account</h2>
+      <p>Use the username and temporary password in your playtest invitation. Returning testers can use their current password.</p>
+      <form data-step="sign-in" method="post">
+        <label>Username<input name="username" autocomplete="username" maxlength="128" required /></label>
+        <label>Password<input name="password" type="password" autocomplete="current-password" maxlength="256" required /></label>
+        <div class="buttons"><button class="button button-primary" type="submit">Continue</button><button type="button" data-action="show-reset">Reset password</button></div>
+      </form>
+    </section>
+    <section data-view="new-password" hidden>
+      <h2 tabindex="-1">Choose a password</h2>
+      <p>Use at least 16 characters, including uppercase and lowercase letters, a number, and a symbol.</p>
+      <form data-step="new-password" method="post">
+        <label>New password<input name="password" type="password" autocomplete="new-password" minlength="16" maxlength="256" required /></label>
+        <button class="button button-primary" type="submit">Set password</button>
+      </form>
+    </section>
+    <section data-view="sign-in-code" hidden>
+      <h2 tabindex="-1">Enter your authenticator code</h2>
+      <form data-step="sign-in-code" method="post">
+        <label>Verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <button class="button button-primary" type="submit">Verify</button>
+      </form>
+    </section>
+    <section data-view="email" hidden>
+      <h2 tabindex="-1">Verify your recovery email</h2>
+      <p>Verify an email address to reset your password later.</p>
+      <form data-step="email" method="post">
+        <label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" required /></label>
+        <button class="button button-primary" type="submit">Send verification code</button>
+      </form>
+    </section>
+    <section data-view="email-code" hidden>
+      <h2 tabindex="-1">Check your email</h2>
+      <form data-step="email-code" method="post">
+        <label>Email verification code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <div class="buttons"><button class="button button-primary" type="submit">Verify email</button><button type="button" data-action="resend-email">Resend code</button></div>
+      </form>
+    </section>
+    <section data-view="security" hidden>
+      <h2 tabindex="-1">Add an authenticator</h2>
+      <p>Optional. An authenticator app adds a code to future sign-ins. You can set it up now or return later.</p>
+      <div class="buttons"><button class="button button-primary" type="button" data-action="setup-totp">Set up authenticator</button><button type="button" data-action="finish">Skip for now</button></div>
+    </section>
+    <section data-view="totp" hidden>
+      <h2 tabindex="-1">Scan the QR code</h2>
+      <p>Scan this code in your authenticator app, or enter the setup key in the app. Then enter the six-digit code it generates.</p>
+      <img data-totp-qr width="180" height="180" alt="Authenticator setup QR code" />
+      <details><summary>Show setup key</summary><code data-totp-key></code></details>
+      <form data-step="totp" method="post">
+        <label>Authenticator code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <button class="button button-primary" type="submit">Enable authenticator</button>
+      </form>
+    </section>
+    <section data-view="complete" hidden>
+      <h2 tabindex="-1">Account setup complete</h2>
+      <p>Use the Theia launcher to sign in and play once your playtest access is approved.</p>
+      <a class="button button-primary" href={url('download/')}>Get the launcher</a>
+    </section>
+    <section data-view="reset" hidden>
+      <h2 tabindex="-1">Reset your password</h2>
+      <p>Cognito sends a code to the verified recovery email on your account.</p>
+      <form data-step="reset" method="post">
+        <label>Username<input name="username" autocomplete="username" maxlength="128" required /></label>
+        <button class="button button-primary" type="submit">Send reset code</button>
+      </form>
+    </section>
+    <section data-view="reset-code" hidden>
+      <h2 tabindex="-1">Set a new password</h2>
+      <form data-step="reset-code" method="post">
+        <label>Reset code<input name="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" required /></label>
+        <label>New password<input name="password" type="password" autocomplete="new-password" minlength="16" maxlength="256" required /></label>
+        <div class="buttons"><button class="button button-primary" type="submit">Reset password</button><button type="button" data-action="resend-reset">Resend code</button></div>
+      </form>
+    </section>
+    <button class="start-over" type="button" data-action="start-over" hidden>Back to account setup</button>
+  </section>
+</Inner>
+
+<script>
+  import { startAccountPage } from '../lib/account';
+  const account = document.querySelector<HTMLElement>('[data-account]');
+  if (account) startAccountPage(account);
+</script>
+
+<style>
+  .account { width: min(100%, 36rem); margin: 0 auto; padding: clamp(1rem, 5vw, 2rem); border: 1px solid var(--gold); background: #071c2b; }
+  .account h2 { margin: 0 0 .75rem; color: var(--gold); font-family: var(--display); }
+  .account p { margin: 0 0 1rem; }
+  .account form { display: grid; gap: .875rem; margin-top: 1rem; }
+  .account label { display: grid; gap: .25rem; color: var(--white); }
+  .account input { width: 100%; min-width: 0; min-height: 44px; padding: .5rem .75rem; border: 1px solid #9b855b; color: var(--white); background: #031421; font: inherit; }
+  .account button:not(.button) { min-height: 44px; padding: .5rem; border: 0; background: transparent; color: var(--gold); font: inherit; text-decoration: underline; cursor: pointer; }
+  .account button:disabled { opacity: .65; cursor: wait; }
+  .account .buttons { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+  .account .account-message { color: #fff0ca; margin-bottom: 1rem; }
+  .account .start-over { margin-top: 1rem; }
+  .account img[data-totp-qr] { width: 180px; height: 180px; margin: 1rem 0; }
+  .account code { overflow-wrap: anywhere; }
+</style>
