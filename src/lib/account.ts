@@ -58,6 +58,7 @@ export function startAccountPage(root: HTMLElement) {
   const profileAuthenticator = root.querySelector<HTMLElement>('[data-profile-authenticator]')!;
   const profileMfa = root.querySelector<HTMLElement>('[data-mfa-status]')!;
   const profileDownload = root.querySelector<HTMLElement>('[data-profile-download]')!;
+  const launcherButton = root.querySelector<HTMLTemplateElement>('[data-profile-launcher]')?.content;
   const pageTitle = document.querySelector<HTMLHeadingElement>('.inner-hero h1')!;
   const signInTitle = pageTitle.textContent;
   const rosterStatus = root.querySelector<HTMLElement>('[data-roster-status]')!;
@@ -123,7 +124,7 @@ export function startAccountPage(root: HTMLElement) {
     username = resetUser = email = '';
     profileName.textContent = profileSetup.textContent = profileAccess.textContent = profileMfa.textContent = '';
     profileAuthenticator.hidden = true;
-    profileDownload.hidden = true;
+    profileDownload.replaceChildren();
     clearRoster();
     for (const form of root.querySelectorAll<HTMLFormElement>('form')) form.reset();
     await signOut();
@@ -225,7 +226,8 @@ export function startAccountPage(root: HTMLElement) {
     const mfaEnabled = preference.enabled?.includes('TOTP') ?? false;
     profileMfa.textContent = mfaEnabled ? 'Enabled' : 'Off';
     profileAuthenticator.hidden = mfaEnabled;
-    profileDownload.hidden = !approved;
+    profileDownload.replaceChildren();
+    if (approved && launcherButton) profileDownload.append(launcherButton.cloneNode(true));
     history.replaceState(null, '', profileUrl);
     show('profile');
     void loadRoster(approved, tokens.accessToken.toString());

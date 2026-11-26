@@ -110,6 +110,63 @@ test('mobile menu opens, closes with Escape and navigates', async ({ page }) => 
   await expect(page).toHaveURL(/\/world\/$/);
 });
 
+test('Public downloads direct Linux testers to their account', async ({ page }) => {
+  await page.goto('./download/');
+  const linux = page.locator('.linux-platform');
+  await expect(linux.getByText('Available - Pre-Alpha Testers Only')).toBeVisible();
+  await expect(linux.getByRole('button', { name: 'Download Launcher' })).toBeDisabled();
+  await expect(page.locator('a[href$=".deb"]')).toHaveCount(0);
+  await linux.getByRole('link', { name: 'Sign in to your account' }).click();
+  await expect(page).toHaveURL(/\/account\/$/);
+  await expect(page.locator('a[href$=".deb"]')).toHaveCount(0);
+});
+
+test('Playtest access requests complete on the download page', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('./download/');
+  const section = page.getByRole('region', { name: 'Request Access' });
+  await expect(section).toBeVisible();
+  const formId = process.env.PUBLIC_THEIA_PLAYTEST_FORM_ID?.trim() ?? '';
+  if (!/^[a-z0-9]{1,64}$/i.test(formId)) {
+    await expect(section.getByText('Online access requests are currently unavailable.')).toBeVisible();
+    await expect(section.getByRole('form')).toHaveCount(0);
+    return;
+  }
+  const pageUrl = page.url();
+  const email = section.getByLabel('Email address');
+  const message = section.getByLabel(/What would you like to test/);
+  const submit = section.getByRole('button', { name: 'Request an invitation' });
+  const status = section.getByRole('status');
+  let attempts = 0;
+  await page.route(`https://formspree.io/f/${formId}`, async (route) => {
+    attempts += 1;
+    const request = route.request();
+    expect(request.method()).toBe('POST');
+    expect(request.headers().accept).toBe('application/json');
+    expect(request.postData()).toContain('tester@example.com');
+    expect(request.postData()).toContain('Party quests');
+    await route.fulfill({
+      status: attempts === 1 ? 429 : 200,
+      headers: { 'access-control-allow-origin': '*' },
+      json: { ok: attempts !== 1 },
+    });
+  });
+  await submit.click();
+  await expect(email).toBeFocused();
+  expect(attempts).toBe(0);
+  await email.fill('tester@example.com');
+  await message.fill('Party quests');
+  await submit.click();
+  await expect(status).toContainText('Please try again later.');
+  await expect(email).toHaveValue('tester@example.com');
+  await submit.click();
+  await expect(status).toContainText('Request received.');
+  await expect(email).toHaveValue('');
+  await expect(page).toHaveURL(pageUrl);
+  expect(page.context().pages()).toHaveLength(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+});
+
 test('Account opens on desktop and mobile and fits small screens', async ({ page }) => {
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: width === 320 ? 568 : 900 });
@@ -148,6 +205,7 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
       await expect(page).toHaveURL(/\/account\/$/);
       await expect(form).toBeVisible();
       await expect(page.getByRole('heading', { name: 'Account overview' })).toBeHidden();
+      await expect(page.locator('[data-profile-download] a')).toHaveCount(0);
     } else {
       await expect(form).toBeHidden();
       await expect(page.getByText('Account setup is currently unavailable.')).toBeVisible();
