@@ -14,6 +14,12 @@ The editor and the game came together in a starter valley where we could place s
 - Add a scenery browser to preview models before placing them in the zone. Place huts, foliage, and props with checked scale, grounding, and collision.
 - Draw and reshape NPC spawn areas, edit patrol routes, and inspect the quest and creature definitions tied to a placement. Add tools to locate escort routes and collection sites directly from the quest inspector.
 - Configure test-player spawns and start or stop multiplayer sessions from the editor. Export checked terrain, navigation, and gameplay content together.
+- Inspect a creature’s spawn area directly on the terrain and check whether its placements land on reachable ground. Open an escort from its quest contact to see where the route begins and ends.
+
+## Particles
+
+- Embed the Sprinkles particle workspace in our Bevy editor so we can adjust an effect’s emitters, colour gradients, and curves without leaving the open zone. [See the particle workspace](../development-highlight-particle-workspace/).
+- Compare all seven bundled effects side by side with the original Sprinkles preview, using the same effect files, random seeds, and fixed simulation steps. Then export placed effects with their textures and test the resulting world on two connected clients.
 
 ## Characters and animation
 
@@ -24,9 +30,11 @@ The editor and the game came together in a starter valley where we could place s
 
 - Build an editable starter valley with access roads, named contacts, traders, and creature patrols. Test a hunt for pelts, location objectives, quest travel, and vendor interactions with two characters progressing independently.
 - Refine campaign dialogue and quest prerequisites across races, including shared Covenant chapters and race-specific homecomings.
+- Give Rowan’s compass quest a private pickup in Northern Meadow. Finding the compass changes the objective to returning it to Rowan. A separate hunt counts pelts once they reach the bag and removes three at turn-in.
 
 ## Engine, client, and server
 
 - Use authored terrain and navigation in predicted multiplayer movement. Check patrols and player travel routes against the zone’s collision before play, including the outward and return legs.
 - Give spawned creatures independent pursuit, threat, return, and respawn behaviour. Verify that quest loot and rewards go to the eligible character and persist across reconnects.
 - Add in-game party controls to the editor’s account playtests so two players can form and manage a group.
+- Smooth whole-character movement when render frames and server updates arrive at different rates. This makes movement steadier during close-up interactions such as picking up quest items.
