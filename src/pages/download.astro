@@ -17,6 +17,14 @@ const requestEndpoint = /^[a-z0-9]{1,64}$/i.test(formId) ? `https://formspree.io
       ? <form method="post" data-access-request={requestEndpoint} aria-labelledby="request-access-title">
           <fieldset disabled>
             <label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" required /></label>
+            <label>Platform
+              <select name="platform" required>
+                <option value="" disabled selected>Select a platform</option>
+                <option>Windows</option>
+                <option>Linux</option>
+                <option>Mac</option>
+              </select>
+            </label>
             <label><span>What would you like to test? <span class="note">(optional)</span></span><textarea name="message" rows="3" maxlength="500"></textarea></label>
             <p class="note">We’ll use your email to follow up about the pre-alpha.</p>
             <Button primary type="submit">Request an invitation</Button>
@@ -32,7 +40,7 @@ const requestEndpoint = /^[a-z0-9]{1,64}$/i.test(formId) ? `https://formspree.io
   .access-request { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem clamp(1.25rem, 5vw, 4rem); }
   .access-request fieldset { display: grid; gap: .8rem; min-width: 0; margin: 0; padding: 0; border: 0; }
   .access-request label { display: grid; gap: .3rem; }
-  .access-request input, .access-request textarea {
+  .access-request input, .access-request select, .access-request textarea {
     width: 100%;
     padding: .5rem .65rem;
     border: 1px solid #a1814d;
@@ -40,6 +48,7 @@ const requestEndpoint = /^[a-z0-9]{1,64}$/i.test(formId) ? `https://formspree.io
     color: var(--white);
     font: inherit;
   }
+  .access-request select { color-scheme: dark; }
   .access-request textarea { resize: vertical; }
   .access-request form :global(.button) { justify-self: start; margin-top: 0; }
   .access-request form :global(.button:disabled) { opacity: .65; }

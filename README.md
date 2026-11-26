@@ -114,7 +114,7 @@ References: [VentraIP DNS management](https://ventraip.com.au/support-centre/add
   the launcher and update feed on the separate `theia-mmo` Pages project.
   The underlying installer and feed URLs are public.
 - The header's **Account** link opens `/account/` for invited testers. Set GitHub Pages variables `THEIA_ACCOUNT_POOL_ID` and `THEIA_ACCOUNT_CLIENT_ID` to the account client outputs from the existing Cognito stack. The site uses Cognito SRP for setup, verifies a recovery email, offers optional authenticator setup and handles password reset codes. Invite and approve testers in Cognito. The browser keeps its account session in memory.
-- The **Request Access** form on `/download/` sends requests to a Formspree inbox. Create the form with a verified target email and set the website Actions variable `THEIA_PLAYTEST_FORM_ID` to the ID shown in its Integration tab. For local builds, set `PUBLIC_THEIA_PLAYTEST_FORM_ID`. The form accepts an email address and optional testing interests. Review requests privately and send invitations through Cognito.
+- The **Request Access** form on `/download/` sends requests to a Formspree inbox. Create the form with a verified target email and set the website Actions variable `THEIA_PLAYTEST_FORM_ID` to the ID shown in its Integration tab. For local builds, set `PUBLIC_THEIA_PLAYTEST_FORM_ID`. The form collects an email address, a platform and optional testing interests. Review requests privately and send invitations through Cognito.
 - Source references and artwork provenance: [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), [docs/ASSETS.md](docs/ASSETS.md).
 
 ## Browser validation
