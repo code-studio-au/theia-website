@@ -11,24 +11,24 @@ The training zone began to connect combat, quests, and inventory into a single p
 
 ## Client
 
-- Add target selection and spell feedback, a backpack, and an in-game vendor panel for the first barter offer.
+- Add target selection and spell feedback, a backpack, and an in-game vendor panel for the first barter offer, trading a token for training stones.
 - Show experience gains, quest objective progress, and supported rewards as players complete encounters.
 
 ## Characters and animation
 
-- Test an animated wolf that chases a player, attacks within reach, and returns to its patrol when the pursuit ends.
+- Test an animated wolf that chases a player, attacks within reach, and returns to its patrol when the pursuit ends, resuming at its previous patrol position.
 - Add equipment attachment points, sword holding poses, and upper-body attack animation that can play while a character walks or runs.
 
 ## World building
 
 - Exercise an NPC guide, initial kill objectives, personal rewards, and a vendor trade in the training zone.
-- Draft the launch campaign and expand the lore and travel notes that would guide later zone and quest work.
+- Draft the launch campaign and expand the lore and travel notes that would guide later zone and quest work, including routes between early campaign regions.
 
 ## Server and gameplay
 
 - Save character positions, bags, equipped items, and progression. Verify that earned rewards and trades survive reconnecting and restarting the server and database.
-- Add server-checked combat outcomes, including sword strikes, status effects, and travelling spells that resolve on impact.
+- Add server-checked combat outcomes, including sword strikes, status effects, and travelling spells that resolve on impact, with terrain able to block them.
 
 ## Authoring tools
 
-- Add an offline validator that checks references between the item, ability, NPC, and creature files before a gameplay build is run.
+- Add an offline validator that checks references between the item, ability, NPC, and creature files before a gameplay build is run. It records hashes for checked files.
