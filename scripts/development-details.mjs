@@ -37,6 +37,9 @@ export const developmentDetails = [
     'Activate the full Theia playtest profile with NPC contacts, enemy loot, quests, inventory, progression, chat and parties.',
     'Configure Cognito for invite-only accounts, verified email recovery and optional authenticator MFA.',
   ] },
+  { product: 'server', version: '0.1.0-main.f9e55347', date: '2026-11-26T10:00:04Z', notes: [
+    'Serve saved character stats to approved website accounts while Theia is online. Checking your account leaves a sleeping realm offline.',
+  ] },
   { product: 'website', version: '59ac2cd', date: '2026-11-24T01:19:42Z', notes: [
     'Publish Theia Online on its own HTTPS domain with illustrated world and faction pages, a media gallery, and news.',
   ] },
@@ -58,5 +61,12 @@ export const developmentDetails = [
   ] },
   { product: 'website', version: '53382db', date: '2026-11-26T05:17:27Z', notes: [
     'Use the gold action style for account submissions and themed text links for Reset password, Back, Skip and Sign out.',
+  ] },
+  { product: 'website', version: 'e273efb', date: '2026-11-26T10:05:19Z', notes: [
+    'Add an account overview with playtest approval status and a character switcher that shows level, total XP and last save.',
+  ] },
+  { product: 'website', version: 'dc0efe1', date: '2026-11-26T10:36:53Z', notes: [
+    'Move the Linux launcher download into approved tester accounts and mark the public Linux download as pre-alpha tester only.',
+    'Open pre-alpha invitation requests on the Downloads page and show confirmation there after submission.',
   ] },
 ];
