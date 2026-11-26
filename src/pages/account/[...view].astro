@@ -1,17 +1,22 @@
 ---
-import Inner from '../layouts/Inner.astro';
-import Button from '../components/Button.astro';
-import { url } from '../lib/site';
+import Inner from '../../layouts/Inner.astro';
+import Button from '../../components/Button.astro';
+import { url } from '../../lib/site';
+
+export function getStaticPaths() {
+  return [{ params: { view: undefined } }, { params: { view: 'profile' } }];
+}
 const pool = import.meta.env.PUBLIC_THEIA_ACCOUNT_POOL_ID ?? '';
 const client = import.meta.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID ?? '';
 const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$/.test(client);
 ---
 <Inner title="Your Theia account" eyebrow="Playtest access" description="Set up an invited account, add an authenticator, or recover your password.">
-  <section class="account" data-account data-pool={configured ? pool : undefined} data-client={configured ? client : undefined} aria-label="Account setup and recovery">
+  <section class="account" data-account data-pool={configured ? pool : undefined} data-client={configured ? client : undefined}
+    data-account-url={url('account/')} data-profile-url={url('account/profile/')} aria-label="Theia account">
     <p data-unavailable>Account setup is currently unavailable. <a href={url('support/')}>Get help</a>.</p>
     <p class="account-message" data-message aria-live="polite" hidden></p>
     <section data-view="sign-in" hidden>
-      <h2 tabindex="-1">Set up your account</h2>
+      <h2 tabindex="-1">Sign in to your account</h2>
       <p>Use the username and temporary password in your playtest invitation. Returning testers can use their current password.</p>
       <form data-step="sign-in" method="post">
         <label>Username<input name="username" autocomplete="username" maxlength="128" required /></label>
@@ -75,8 +80,23 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
     </section>
     <section data-view="complete" hidden>
       <h2 tabindex="-1">Account setup complete</h2>
-      <p>Use the Theia launcher to sign in and play once your playtest access is approved.</p>
-      <Button primary href={url('download/')}>Get the launcher</Button>
+      <p>Your recovery email is verified. You can check your playtest access in your account.</p>
+      <div class="buttons">
+        <Button primary type="button" data-action="view-account">View account</Button>
+        <Button primary href={url('download/')}>Get the launcher</Button>
+      </div>
+    </section>
+    <section data-view="profile" hidden>
+      <h2 tabindex="-1">Account overview</h2>
+      <p>Signed in as <strong data-profile-name></strong></p>
+      <dl class="account-status">
+        <div><dt>Account setup</dt><dd data-account-setup></dd></div>
+        <div><dt>Game access</dt><dd data-game-access></dd></div>
+      </dl>
+      <div class="buttons" data-profile-authenticator hidden>
+        <Button primary type="button" data-action="setup-totp">Set up authenticator</Button>
+      </div>
+      <button class="account-link" type="button" data-action="sign-out">Sign out</button>
     </section>
     <section data-view="reset" hidden>
       <h2 tabindex="-1">Reset your password</h2>
@@ -102,7 +122,7 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
 </Inner>
 
 <script>
-  import { startAccountPage } from '../lib/account';
+  import { startAccountPage } from '../../lib/account';
   const account = document.querySelector<HTMLElement>('[data-account]');
   if (account) startAccountPage(account);
 </script>
@@ -118,6 +138,10 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
   .account .account-link:hover { color: var(--white); }
   .account button:disabled { opacity: .65; cursor: wait; }
   .account .buttons { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
+  .account .buttons[hidden] { display: none; }
+  .account-status { margin: 0 0 1rem; }
+  .account-status div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; padding: .5rem 0; border-bottom: 1px solid #9b855b; }
+  .account-status dd { margin: 0; color: var(--gold); }
   .account .account-message { color: #fff0ca; margin-bottom: 1rem; }
   .account .start-over { margin-top: 1rem; }
   .account img[data-totp-qr] { width: 180px; height: 180px; margin: 1rem 0; }

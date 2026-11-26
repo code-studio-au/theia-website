@@ -1,6 +1,6 @@
 import { Amplify } from 'aws-amplify';
 import {
-  confirmResetPassword, confirmSignIn, confirmUserAttribute, fetchMFAPreference,
+  confirmResetPassword, confirmSignIn, confirmUserAttribute, fetchAuthSession, fetchMFAPreference,
   fetchUserAttributes, resetPassword, sendUserAttributeVerificationCode, setUpTOTP,
   signIn, signOut, updateMFAPreference, updateUserAttribute, verifyTOTPSetup,
   type SignInOutput,
@@ -10,7 +10,7 @@ import { sharedInMemoryStorage } from 'aws-amplify/utils';
 import { toDataURL } from 'qrcode';
 
 type View = 'sign-in' | 'new-password' | 'sign-in-code' | 'email' | 'email-code'
-  | 'security' | 'totp' | 'complete' | 'reset' | 'reset-code';
+  | 'security' | 'totp' | 'complete' | 'profile' | 'reset' | 'reset-code';
 
 const errors: Record<string, string> = {
   CodeMismatchException: 'That code was not accepted. Check it and try again.',
@@ -24,8 +24,8 @@ const errors: Record<string, string> = {
 };
 
 export function startAccountPage(root: HTMLElement) {
-  const { pool, client } = root.dataset;
-  if (!pool || !client) return;
+  const { pool, client, accountUrl, profileUrl } = root.dataset;
+  if (!pool || !client || !accountUrl || !profileUrl) return;
   Amplify.configure({ Auth: { Cognito: { userPoolId: pool, userPoolClientId: client } } });
   cognitoUserPoolsTokenProvider.setKeyValueStorage(sharedInMemoryStorage);
 
@@ -34,12 +34,17 @@ export function startAccountPage(root: HTMLElement) {
   const startOver = root.querySelector<HTMLButtonElement>('[data-action="start-over"]')!;
   const qr = root.querySelector<HTMLImageElement>('[data-totp-qr]')!;
   const key = root.querySelector<HTMLElement>('[data-totp-key]')!;
+  const profileName = root.querySelector<HTMLElement>('[data-profile-name]')!;
+  const profileSetup = root.querySelector<HTMLElement>('[data-account-setup]')!;
+  const profileAccess = root.querySelector<HTMLElement>('[data-game-access]')!;
+  const profileAuthenticator = root.querySelector<HTMLElement>('[data-profile-authenticator]')!;
   const input = (form: HTMLFormElement, name: string) => form.elements.namedItem(name) as HTMLInputElement;
   let view: View = 'sign-in';
   let busy = false;
   let username = '';
   let resetUser = '';
   let email = '';
+  let completingSetup = false;
   let totpVerified = false;
   let totpDuringSignIn = false;
 
@@ -51,7 +56,8 @@ export function startAccountPage(root: HTMLElement) {
   function show(next: View, focus = true) {
     view = next;
     for (const panel of views) panel.hidden = panel.dataset.view !== next;
-    startOver.hidden = next === 'sign-in';
+    startOver.hidden = next === 'sign-in' || next === 'complete' || next === 'profile';
+    startOver.textContent = location.pathname === profileUrl ? 'Back to account' : 'Back to account setup';
     status('');
     if (focus) root.querySelector<HTMLElement>(`[data-view="${next}"] h2`)?.focus();
   }
@@ -63,24 +69,56 @@ export function startAccountPage(root: HTMLElement) {
     totpDuringSignIn = false;
   }
 
-  async function finish() {
+  function finish() {
     clearSetupKey();
-    await signOut();
+    completingSetup = false;
     show('complete');
+  }
+
+  async function leaveAccount() {
+    clearSetupKey();
+    completingSetup = false;
+    username = resetUser = email = '';
+    profileName.textContent = profileSetup.textContent = profileAccess.textContent = '';
+    profileAuthenticator.hidden = true;
+    for (const form of root.querySelectorAll<HTMLFormElement>('form')) form.reset();
+    await signOut();
+    if (location.pathname === profileUrl) history.replaceState(null, '', accountUrl);
+    show('sign-in');
+  }
+
+  async function showProfile() {
+    const { tokens } = await fetchAuthSession();
+    if (!tokens) {
+      await leaveAccount();
+      status('Sign in again to view your account.');
+      return;
+    }
+    const claims = tokens.accessToken.payload;
+    const groups = claims['cognito:groups'];
+    const preference = await fetchMFAPreference();
+    profileName.textContent = typeof claims.username === 'string' ? claims.username : username;
+    profileSetup.textContent = 'Complete';
+    profileAccess.textContent = Array.isArray(groups) && groups.includes('theia-testers') ? 'Approved' : 'Unapproved';
+    profileAuthenticator.hidden = preference.enabled?.includes('TOTP') ?? false;
+    history.replaceState(null, '', profileUrl);
+    show('profile');
   }
 
   async function chooseAuthenticator() {
     const preference = await fetchMFAPreference();
-    if (preference.enabled?.includes('TOTP')) await finish();
+    if (preference.enabled?.includes('TOTP')) finish();
     else show('security');
   }
 
   async function afterSignIn() {
     const attributes = await fetchUserAttributes();
     if (attributes.email_verified === 'true') {
-      await chooseAuthenticator();
+      if (completingSetup) await chooseAuthenticator();
+      else await showProfile();
       return;
     }
+    completingSetup = true;
     email = attributes.email ?? '';
     const form = root.querySelector<HTMLFormElement>('[data-step="email"]')!;
     input(form, 'email').value = email;
@@ -130,6 +168,7 @@ export function startAccountPage(root: HTMLElement) {
       const secret = input(form, 'password');
       const password = secret.value;
       secret.value = '';
+      completingSetup = true;
       await continueSignIn(await confirmSignIn({ challengeResponse: password }));
     },
     'sign-in-code': async (form) => {
@@ -175,7 +214,9 @@ export function startAccountPage(root: HTMLElement) {
         totpVerified = true;
       }
       await updateMFAPreference({ totp: 'PREFERRED' });
-      await finish();
+      clearSetupKey();
+      if (completingSetup) finish();
+      else await showProfile();
     },
     reset: async (form) => {
       resetUser = input(form, 'username').value.trim();
@@ -201,12 +242,15 @@ export function startAccountPage(root: HTMLElement) {
     },
     'setup-totp': async () => showTotp(await setUpTOTP()),
     finish,
+    'view-account': showProfile,
+    'sign-out': leaveAccount,
     'start-over': async () => {
-      clearSetupKey();
-      username = resetUser = email = '';
-      for (const form of root.querySelectorAll<HTMLFormElement>('form')) form.reset();
-      await signOut();
-      show('sign-in');
+      if (location.pathname === profileUrl) {
+        clearSetupKey();
+        await showProfile();
+      } else {
+        await leaveAccount();
+      }
     },
   };
 
@@ -241,6 +285,7 @@ export function startAccountPage(root: HTMLElement) {
     const action = button?.dataset.action;
     if (action && actions[action]) void run(actions[action]);
   });
+  if (location.pathname === profileUrl) history.replaceState(null, '', accountUrl);
   root.querySelector<HTMLElement>('[data-unavailable]')!.hidden = true;
   show('sign-in', false);
 }
