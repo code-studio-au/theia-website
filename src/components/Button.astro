@@ -1,7 +1,7 @@
 ---
 type Props = { primary?: boolean; class?: string } & (
   | { href: string; type?: never; 'data-action'?: never }
-  | { href?: never; type: 'submit' | 'button'; 'data-action'?: string; hidden?: boolean }
+  | { href?: never; type: 'submit' | 'button'; 'data-action'?: string }
 );
 const { href, type, primary = false, class: className = '', ...attributes } = Astro.props;
 const classes = ['button', { 'button-primary': primary }, className];
@@ -12,5 +12,4 @@ const classes = ['button', { 'button-primary': primary }, className];
 
 <style>
   button.button { border: 0; color: inherit; }
-  button.button[hidden] { display: none; }
 </style>

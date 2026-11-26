@@ -60,7 +60,7 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
       <p>Optional. An authenticator app adds a code to future sign-ins. You can set it up now or return later.</p>
       <div class="buttons">
         <Button primary type="button" data-action="setup-totp">Set up authenticator</Button>
-        <Button primary type="button" data-action="finish">Skip for now</Button>
+        <button class="account-link" type="button" data-action="finish">Skip for now</button>
       </div>
     </section>
     <section data-view="totp" hidden>
@@ -97,7 +97,7 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
         </div>
       </form>
     </section>
-    <Button primary class="start-over" type="button" data-action="start-over" hidden>Back to account setup</Button>
+    <button class="account-link start-over" type="button" data-action="start-over" hidden>Back to account setup</button>
   </section>
 </Inner>
 
@@ -114,6 +114,8 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
   .account form { display: grid; gap: .875rem; margin-top: 1rem; }
   .account label { display: grid; gap: .25rem; color: var(--white); }
   .account input { width: 100%; min-width: 0; min-height: 44px; padding: .5rem .75rem; border: 1px solid #9b855b; color: var(--white); background: #031421; font: inherit; }
+  .account .account-link { min-height: 44px; padding: .5rem 0; border: 0; background: transparent; color: var(--gold); text-decoration: underline; text-underline-offset: .16em; }
+  .account .account-link:hover { color: var(--white); }
   .account button:disabled { opacity: .65; cursor: wait; }
   .account .buttons { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
   .account .account-message { color: #fff0ca; margin-bottom: 1rem; }
