@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readdir, readFile } from 'node:fs/promises';
 
 test('every page, local link and local image resolves under the configured base path', async ({ page, request, baseURL }) => {
-  const paths = ['', 'world/', 'races/', 'story/', 'gameplay/', 'media/', 'news/', 'download/', 'about/', 'community/', 'support/', 'account/', 'news/lore-spotlight-anchors/', 'news/a-world-worth-sharing/'];
+  const paths = ['', 'world/', 'races/', 'story/', 'gameplay/', 'media/', 'news/', 'download/', 'about/', 'community/', 'support/', 'account/', 'account/profile/', 'news/lore-spotlight-anchors/', 'news/a-world-worth-sharing/'];
   const checked = new Set<string>();
   for (const path of paths) {
     const response = await page.goto(path ? `./${path}` : './');
@@ -118,7 +118,7 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
     await page.locator(width < 600 ? '.mobile-login' : '.login-link').click();
     await expect(page).toHaveURL(/\/account\/$/);
     await expect(page.getByRole('heading', { name: 'Your Theia account' })).toBeVisible();
-    const form = page.getByRole('heading', { name: 'Set up your account' });
+    const form = page.getByRole('heading', { name: 'Sign in to your account' });
     if (process.env.PUBLIC_THEIA_ACCOUNT_POOL_ID && process.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID) {
       await expect(form).toBeVisible();
       const continueButton = page.getByRole('button', { name: 'Continue', exact: true });
@@ -132,7 +132,7 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
         return fill ? getComputedStyle(fill).backgroundImage : '';
       }))).toEqual(Array(await accountActions.count()).fill(playNowFill));
       const linkActions = page.locator('[data-account] button:not(.button-primary)');
-      expect(await linkActions.allTextContents()).toEqual(['Skip for now', 'Back to account setup']);
+      expect(await linkActions.allTextContents()).toEqual(['Skip for now', 'Sign out', 'Back to account setup']);
       for (const link of await linkActions.all()) {
         await expect(link).toHaveCSS('text-decoration-line', 'underline');
         await expect(link).toHaveCSS('background-image', 'none');
@@ -144,6 +144,10 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
       await back.click();
       await expect(continueButton).toBeVisible();
       await expect(back).toBeHidden();
+      await page.goto('./account/profile/');
+      await expect(page).toHaveURL(/\/account\/$/);
+      await expect(form).toBeVisible();
+      await expect(page.getByRole('heading', { name: 'Account overview' })).toBeHidden();
     } else {
       await expect(form).toBeHidden();
       await expect(page.getByText('Account setup is currently unavailable.')).toBeVisible();
