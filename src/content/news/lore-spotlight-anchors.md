@@ -1,7 +1,7 @@
 ---
 title: 'Lore Spotlight: The Anchors'
 description: Ancient structures and their dangerous echoes.
-date: 2026-11-22
+date: 2026-11-07
 category: Lore
 image: images/story/anchor-mystery.webp
 imageAlt: Fantasy concept art of a golden crystal suspended within bronze rings in a ruined chamber
@@ -17,6 +17,8 @@ Among these mysteries are the Anchors.
 The first of these structures belongs to a history scarred by catastrophe. Its legacy reaches far beyond a single ruin. Yet the mechanisms encountered in the modern world are not all the same: later Anchors are imperfect echoes of an older design.
 
 That distinction matters. A small resonator can disturb its immediate surroundings. More substantial installations draw on supporting structures and recovered artifacts. Their appearance may be local, but their purpose invites much larger questions.
+
+The scale changes what travellers can discover. A disturbance may lead to a single device, while a larger site can leave clues in the structures around it and the records of people who worked there. A witness may know what happened nearby without knowing who put the mechanism there.
 
 ## More than a ruin
 

@@ -1,7 +1,7 @@
 ---
 title: A World Worth Sharing
 description: Companions and the stories that bring Theia to life.
-date: 2026-11-21
+date: 2026-10-21
 category: Community
 image: images/news-community.webp
 imageAlt: Fantasy concept art of companions looking across a mountain valley
@@ -13,6 +13,8 @@ A world is more than its greatest battles. It is also the crossing a caravan dep
 ## Stories close to home
 
 Theia's Human campaign begins with the concerns of the Heartlands. Millhaven, Stoneford and Greyfall Quarry are places where daily life continues alongside larger troubles. Their stories connect people, work and the roads between settlements.
+
+In Millhaven, that begins with a farming village and the people who keep its mills, market, and roads running. At Stoneford, the river crossing brings carts, traders, and travellers together. An old work track branches away toward Greyfall Quarry, where a local rescue offers a reason to take the quieter road.
 
 The world is being designed to reward curiosity beyond the principal campaign. Regional adventures and the histories of its peoples give you reasons to look beyond the next objective.
 
