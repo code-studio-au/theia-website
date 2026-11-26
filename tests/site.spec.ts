@@ -134,9 +134,11 @@ test('Playtest access requests complete on the download page', async ({ page }) 
   }
   const pageUrl = page.url();
   const email = section.getByLabel('Email address');
+  const platform = section.getByRole('combobox', { name: 'Platform' });
   const message = section.getByLabel(/What would you like to test/);
   const submit = section.getByRole('button', { name: 'Request an invitation' });
   const status = section.getByRole('status');
+  await expect(platform.getByRole('option')).toHaveText(['Select a platform', 'Windows', 'Linux', 'Mac']);
   let attempts = 0;
   await page.route(`https://formspree.io/f/${formId}`, async (route) => {
     attempts += 1;
@@ -144,6 +146,7 @@ test('Playtest access requests complete on the download page', async ({ page }) 
     expect(request.method()).toBe('POST');
     expect(request.headers().accept).toBe('application/json');
     expect(request.postData()).toContain('tester@example.com');
+    expect(request.postData()).toMatch(/name="platform"\r?\n\r?\nWindows/);
     expect(request.postData()).toContain('Party quests');
     await route.fulfill({
       status: attempts === 1 ? 429 : 200,
@@ -155,13 +158,19 @@ test('Playtest access requests complete on the download page', async ({ page }) 
   await expect(email).toBeFocused();
   expect(attempts).toBe(0);
   await email.fill('tester@example.com');
+  await submit.click();
+  await expect(platform).toBeFocused();
+  expect(attempts).toBe(0);
+  await platform.selectOption('Windows');
   await message.fill('Party quests');
   await submit.click();
   await expect(status).toContainText('Please try again later.');
   await expect(email).toHaveValue('tester@example.com');
+  await expect(platform).toHaveValue('Windows');
   await submit.click();
   await expect(status).toContainText('Request received.');
   await expect(email).toHaveValue('');
+  await expect(platform).toHaveValue('');
   await expect(page).toHaveURL(pageUrl);
   expect(page.context().pages()).toHaveLength(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
