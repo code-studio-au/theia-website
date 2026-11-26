@@ -74,8 +74,8 @@ test('news screenshots fill the article column and keep their original proportio
       });
       const screenshots = article.locator('figure img');
       await expect(screenshots).toHaveCount(screenshotCount);
-      const enlargeLinks = article.locator('figure').getByRole('link', { name: /Click to enlarge/ });
-      await expect(enlargeLinks).toHaveCount(screenshotCount);
+      const enlargeNotes = article.locator('figure > figcaption > em');
+      await expect(enlargeNotes).toHaveText(Array(screenshotCount).fill('(click to enlarge)'));
       for (const screenshot of await screenshots.all()) {
         await screenshot.scrollIntoViewIfNeeded();
         const size = await screenshot.evaluate(async (image: HTMLImageElement) => {

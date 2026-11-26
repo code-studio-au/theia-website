@@ -18,9 +18,8 @@ An effect can use several emitters, each with its own timing. We can pause the a
 <figure>
   <a href="../../images/news/theia-particle-workspace.webp">
     <img src="../../images/news/theia-particle-workspace.webp" width="3440" height="1440" loading="lazy" alt="A cyan particle burst playing in Theia’s integrated particle workspace beside the emitter controls">
-    <span>Click to enlarge</span>
   </a>
-  <figcaption>A live particle preview with its emitter controls.</figcaption>
+  <figcaption><em>(click to enlarge)</em><br>A live particle preview with its emitter controls.</figcaption>
 </figure>
 
 ## Keep the zone ready to edit
