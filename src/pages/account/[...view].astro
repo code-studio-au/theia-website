@@ -1,7 +1,7 @@
 ---
 import Inner from '../../layouts/Inner.astro';
 import Button from '../../components/Button.astro';
-import { url } from '../../lib/site';
+import { site, url } from '../../lib/site';
 
 export function getStaticPaths() {
   return [{ params: { view: undefined } }, { params: { view: 'profile' } }];
@@ -87,7 +87,6 @@ const rosterUrl = /^https:\/\/([a-z0-9-]+\.)+theiaonline\.com$/i.test(characterO
       <p>Your recovery email is verified. You can check your playtest access in your account.</p>
       <div class="buttons">
         <Button primary type="button" data-action="view-account">View account</Button>
-        <Button primary href={url('download/')}>Get the launcher</Button>
       </div>
     </section>
     <section data-view="profile" class="profile-grid" aria-label="Account overview" hidden>
@@ -97,7 +96,12 @@ const rosterUrl = /^https:\/\/([a-z0-9-]+\.)+theiaonline\.com$/i.test(characterO
             <p class="realm-caption">Development realm</p>
             <h2 id="profile-realm">Theia</h2>
             <dl class="realm-access"><dt>Game access</dt><dd data-game-access></dd></dl>
-            <div data-profile-download hidden><Button primary href={url('download/')}>Get the launcher</Button></div>
+            <div data-profile-download></div>
+            {site.downloads.linux && (
+              <template data-profile-launcher>
+                <Button primary href={site.downloads.linux}>Download Launcher</Button>
+              </template>
+            )}
           </div>
         </section>
         <section class="profile-panel" aria-labelledby="account-characters">

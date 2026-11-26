@@ -1,28 +1,44 @@
 ---
 import Inner from '../layouts/Inner.astro';
 import Button from '../components/Button.astro';
-import { site, url } from '../lib/site';
+import { url } from '../lib/site';
+const formId = (import.meta.env.PUBLIC_THEIA_PLAYTEST_FORM_ID ?? '').trim();
+const requestEndpoint = /^[a-z0-9]{1,64}$/i.test(formId) ? `https://formspree.io/f/${formId}` : undefined;
 const platforms = [
   { id: 'windows', name: 'Windows', status: 'Planned', description: 'A Windows installer is planned. Supported versions and requirements will be confirmed with a public release.' },
-  { id: 'linux', name: 'Linux', status: 'In development', description: site.downloads.linux
-    ? 'Install the Linux AMD64 launcher to download and update the game.'
-    : 'The Linux AMD64 launcher currently supports trusted local development packages. A public download will be announced when ready.' },
+  { id: 'linux', name: 'Linux', status: 'Available - Pre-Alpha Testers Only', description: 'The Linux AMD64 launcher is available from your account after playtest approval.' },
   { id: 'macos', name: 'Mac', status: 'Planned', description: 'A macOS version is planned. Supported Mac models and system requirements will be confirmed with a future release.' },
 ] as const;
 ---
 <Inner title="Your Journey Awaits" eyebrow="Play Theia Online" description="A living world is taking shape. Follow its development and prepare for your first adventure." image="images/hero.webp">
   <div class="content-grid platform-grid">
     {platforms.map((platform) => <section class:list={["content-panel", { "linux-platform": platform.id === "linux" }]}>
-      <span class="status-label">{platform.id === 'linux' && site.downloads.linux ? 'Available' : platform.status}</span>
+      <span class="status-label">{platform.status}</span>
       <h2>{platform.name}</h2>
       <p>{platform.description}</p>
-      {platform.id === 'linux' && site.downloads.linux
-        ? <Button primary href={site.downloads.linux}>Download Launcher</Button>
-        : <button class:list={['button', 'launcher-button', { 'button-primary': platform.id === 'linux' }]} type="button" disabled={platform.id !== 'linux'} data-launcher-unavailable={platform.id === 'linux' ? '' : undefined}><span>Download Launcher</span></button>}
-      {platform.id === 'linux' && <p class="note launcher-status" id="linux-download-status" role="status"></p>}
+      <button class:list={['button', 'launcher-button', { 'button-primary': platform.id === 'linux' }]} type="button" disabled><span>Download Launcher</span></button>
+      {platform.id === 'linux' && <p class="launcher-sign-in"><a href={url('account/')}>Sign in to your account</a></p>}
     </section>)}
   </div>
-  <section class="prose"><h2>Stay close to the adventure</h2><p>Read the latest news for development progress and future availability announcements, or subscribe to the <a href={url('rss.xml')}>news feed</a>.</p></section>
+  <section class="content-panel access-request" id="request-access" aria-labelledby="request-access-title">
+    <div>
+      <h2 id="request-access-title">Request Access</h2>
+      <p>Theia is inviting pre-alpha testers to try early builds, report bugs, and share feedback as we develop the game.</p>
+      <p>If selected, you’ll receive an invitation by email.</p>
+    </div>
+    {requestEndpoint
+      ? <form method="post" data-access-request={requestEndpoint} aria-labelledby="request-access-title">
+          <fieldset disabled>
+            <label>Email address<input name="email" type="email" autocomplete="email" maxlength="254" required /></label>
+            <label><span>What would you like to test? <span class="note">(optional)</span></span><textarea name="message" rows="3" maxlength="500"></textarea></label>
+            <p class="note">We’ll use your email to follow up about the pre-alpha.</p>
+            <Button primary type="submit">Request an invitation</Button>
+          </fieldset>
+          <p role="status" data-request-status></p>
+          <noscript><p class="note">Enable JavaScript to send a request.</p></noscript>
+        </form>
+      : <p class="note">Online access requests are currently unavailable.</p>}
+  </section>
 </Inner>
 
 <style>
@@ -36,16 +52,66 @@ const platforms = [
   .launcher-button { border: 0; color: inherit; font-family: inherit; }
   .launcher-button:disabled { opacity: .45; cursor: not-allowed; }
   .launcher-button:disabled:hover { filter: none; }
-  .launcher-status:empty { display: none; }
-  .launcher-status:not(:empty) { margin-top: 14px; }
+  .linux-platform .launcher-sign-in { margin: .85rem 0 0; }
+  .access-request { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem clamp(1.25rem, 5vw, 4rem); }
+  .access-request fieldset { display: grid; gap: .8rem; min-width: 0; margin: 0; padding: 0; border: 0; }
+  .access-request label { display: grid; gap: .3rem; }
+  .access-request input, .access-request textarea {
+    width: 100%;
+    padding: .5rem .65rem;
+    border: 1px solid #a1814d;
+    background: #051824;
+    color: var(--white);
+    font: inherit;
+  }
+  .access-request textarea { resize: vertical; }
+  .access-request form :global(.button) { justify-self: start; margin-top: 0; }
+  .access-request form :global(.button:disabled) { opacity: .65; }
+  .access-request [data-request-status] { margin: 0; color: #ffdda0; }
+  .access-request [data-request-status]:not(:empty) { margin-top: .8rem; }
   @media (max-width: 900px) {
     .platform-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 680px) {
+    .access-request { grid-template-columns: 1fr; }
   }
 </style>
 
 <script>
-  document.querySelector('[data-launcher-unavailable]')?.addEventListener('click', () => {
-    const status = document.querySelector('#linux-download-status');
-    if (status) status.textContent = 'The Linux launcher download is not available yet. Please check back soon.';
-  });
+  const form = document.querySelector<HTMLFormElement>('[data-access-request]');
+  const endpoint = form?.dataset.accessRequest;
+  if (form && endpoint) {
+    const fields = form.querySelector('fieldset')!;
+    const submit = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const status = form.querySelector<HTMLElement>('[data-request-status]')!;
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (submit.disabled) return;
+      submit.disabled = true;
+      status.textContent = 'Sending your request…';
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { Accept: 'application/json' },
+          credentials: 'omit',
+          redirect: 'error',
+          signal: AbortSignal.timeout(12000),
+        });
+        if (!response.ok) {
+          status.textContent = response.status === 429
+            ? 'We’re unable to accept requests right now. Please try again later.'
+            : 'We couldn’t send your request. Please try again.';
+          return;
+        }
+        form.reset();
+        status.textContent = 'Request received. We’ll email you if an invitation is available.';
+      } catch {
+        status.textContent = 'We couldn’t confirm your request. Please try again later.';
+      } finally {
+        submit.disabled = false;
+      }
+    });
+    fields.disabled = false;
+  }
 </script>
