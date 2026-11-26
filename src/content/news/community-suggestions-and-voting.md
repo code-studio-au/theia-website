@@ -1,7 +1,7 @@
 ---
 title: A Place to Share and Vote on Ideas
 description: We’re planning a community board for submitting feature ideas and upvoting the suggestions you’d most like to see.
-date: 2026-11-27
+date: 2026-11-24
 category: Community
 image: images/news/community-ideas.webp
 imageAlt: Travellers place bronze voting tokens beside slips of parchment on an inn table
