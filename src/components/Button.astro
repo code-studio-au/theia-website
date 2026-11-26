@@ -1,5 +1,15 @@
 ---
-interface Props { href: string; primary?: boolean; class?: string }
-const { href, primary = false, class: className = '' } = Astro.props;
+type Props = { primary?: boolean; class?: string } & (
+  | { href: string; type?: never }
+  | { href?: never; type: 'submit' | 'button' }
+);
+const { href, type, primary = false, class: className = '' } = Astro.props;
+const classes = ['button', { 'button-primary': primary }, className];
 ---
-<a href={href} class:list={['button', { 'button-primary': primary }, className]}><span><slot /></span></a>
+{href === undefined
+  ? <button type={type} class:list={classes}><span><slot /></span></button>
+  : <a href={href} class:list={classes}><span><slot /></span></a>}
+
+<style>
+  button.button { border: 0; color: inherit; }
+</style>
