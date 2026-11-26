@@ -1,15 +1,16 @@
 ---
 type Props = { primary?: boolean; class?: string } & (
-  | { href: string; type?: never }
-  | { href?: never; type: 'submit' | 'button' }
+  | { href: string; type?: never; 'data-action'?: never }
+  | { href?: never; type: 'submit' | 'button'; 'data-action'?: string; hidden?: boolean }
 );
-const { href, type, primary = false, class: className = '' } = Astro.props;
+const { href, type, primary = false, class: className = '', ...attributes } = Astro.props;
 const classes = ['button', { 'button-primary': primary }, className];
 ---
 {href === undefined
-  ? <button type={type} class:list={classes}><span><slot /></span></button>
-  : <a href={href} class:list={classes}><span><slot /></span></a>}
+  ? <button {...attributes} type={type} class:list={classes}><span><slot /></span></button>
+  : <a {...attributes} href={href} class:list={classes}><span><slot /></span></a>}
 
 <style>
   button.button { border: 0; color: inherit; }
+  button.button[hidden] { display: none; }
 </style>
