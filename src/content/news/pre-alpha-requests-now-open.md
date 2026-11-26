@@ -3,8 +3,8 @@ title: Pre-Alpha Requests Now Open
 description: Request an invitation to test early builds of Theia and share feedback with the development team.
 date: 2026-11-26T10:37:15Z
 category: Community
-image: images/story/heartlands.webp
-imageAlt: Concept art of a village in the Heartlands
+image: images/news/pre-alpha-invites.webp
+imageAlt: Two travellers arrive at the open gate of a Heartlands settlement at dawn
 ---
 
 Theia is inviting pre-alpha testers to try early builds, report bugs, and share feedback as we develop the game.
