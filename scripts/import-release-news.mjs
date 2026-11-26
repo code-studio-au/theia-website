@@ -2,9 +2,15 @@ import { createPublicKey, verify } from 'node:crypto';
 import { readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { developmentDetails } from './development-details.mjs';
 
 const MAX_BYTES = 1024 * 1024;
-const GENERATED = /^auto-(client|launcher)-\d+(?:-\d+){2,3}\.md$/;
+const GENERATED = /^auto-(?:(client|launcher)-\d+(?:-\d+){2,3}|development-\d{4}-\d{2}-\d{2})\.md$/;
+const FIRST_WEEK = '2026-11-23';
+const SITE_DATE = new Intl.DateTimeFormat('en-AU', {
+  timeZone: 'Australia/Sydney', year: 'numeric', month: 'numeric', day: 'numeric',
+});
+const WEEK_TITLE = new Intl.DateTimeFormat('en-AU', { timeZone: 'UTC', dateStyle: 'long' });
 const VERSION = /^(0|[1-9][0-9]{0,7})(\.(0|[1-9][0-9]{0,7})){2,3}$/;
 const DATE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 const STYLE = {
@@ -80,21 +86,66 @@ function article(entry) {
     + '\n\n[Go to downloads](../../download/)\n';
 }
 
-export async function importReleaseNews(input, key, output) {
+function weekOf(date) {
+  const parts = Object.fromEntries(SITE_DATE.formatToParts(new Date(date)).map(({ type, value }) => [type, value]));
+  const monday = new Date(Date.UTC(Number(parts.year), Number(parts.month) - 1, Number(parts.day)));
+  monday.setUTCDate(monday.getUTCDate() - (monday.getUTCDay() + 6) % 7);
+  return monday.toISOString().slice(0, 10);
+}
+
+function weeklyArticle(week, entries) {
+  const sorted = [...entries].sort((a, b) => a.date.localeCompare(b.date)
+    || a.version.localeCompare(b.version, 'en', { numeric: true }));
+  const fields = { title: `Development Update — ${WEEK_TITLE.format(new Date(week))}`,
+    description: 'This week’s Launcher, Client and Server changes for Theia.',
+    date: sorted.at(-1).date, category: 'Development', image: STYLE.client[1], imageAlt: STYLE.client[2] };
+  const header = Object.entries(fields).map(([key, value]) => `${key}: ${JSON.stringify(value)}`).join('\n');
+  const sections = [['launcher', 'Launcher'], ['client', 'Client'], ['server', 'Server']].map(([product, name]) => {
+    const releases = sorted.filter(entry => entry.product === product);
+    if (!releases.length) return `## ${name}\n\nNo builds recorded this week.`;
+    const first = releases[0].version;
+    const last = releases.at(-1).version;
+    const versions = first === last ? `**${first}**` : `**${first} → ${last}**`;
+    const notes = [...new Set(releases.flatMap(entry => entry.notes))];
+    return `## ${name}\n\n${versions}\n\n${notes.map(line => `- ${escapeMarkdown(line)}`).join('\n')}`;
+  });
+  return `---\n${header}\n---\n\n${sections.join('\n\n')}\n`;
+}
+
+export async function importReleaseNews(input, key, output, details = []) {
   const entries = decodeNews(input, key);
   const existing = await readdir(output);
-  await Promise.all(existing.filter(name => GENERATED.test(name)).map(name => rm(resolve(output, name))));
-  const posts = entries.filter(entry => !existing.includes(`${slug(entry)}.md`));
-  for (const entry of posts) {
-    await writeFile(resolve(output, `auto-${slug(entry)}.md`), article(entry), { flag: 'wx' });
+  const weeks = new Map();
+  const posts = new Map();
+  for (const entry of entries) {
+    const week = weekOf(entry.date);
+    if (week >= FIRST_WEEK) {
+      if (!weeks.has(week)) weeks.set(week, new Map());
+      weeks.get(week).set(slug(entry), entry);
+    } else if (!existing.includes(`${slug(entry)}.md`)) {
+      posts.set(`auto-${slug(entry)}.md`, article(entry));
+    }
   }
-  return posts.length;
+  for (const entry of details) {
+    const week = weekOf(entry.date);
+    if (!weeks.has(week)) weeks.set(week, new Map());
+    const weekly = weeks.get(week);
+    const previous = weekly.get(slug(entry));
+    const earlierNotes = previous?.notes.map(line => entry.corrections?.[line] ?? line) ?? [];
+    weekly.set(slug(entry), { ...(previous ?? entry), notes: [...earlierNotes, ...entry.notes] });
+  }
+  for (const [week, releases] of weeks) {
+    posts.set(`auto-development-${week}.md`, weeklyArticle(week, [...releases.values()]));
+  }
+  await Promise.all(existing.filter(name => GENERATED.test(name)).map(name => rm(resolve(output, name))));
+  for (const [filename, content] of posts) await writeFile(resolve(output, filename), content, { flag: 'wx' });
+  return posts.size;
 }
 
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const path = process.argv[2];
   if (!path || (await stat(path)).size > MAX_BYTES) throw new Error('Expected a bounded release news file');
   const count = await importReleaseNews(await readFile(path), process.env.THEIA_RELEASE_PUBLIC_KEY,
-    fileURLToPath(new URL('../src/content/news/', import.meta.url)));
+    fileURLToPath(new URL('../src/content/news/', import.meta.url)), developmentDetails);
   console.log(`Imported ${count} release news posts.`);
 }

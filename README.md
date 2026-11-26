@@ -107,13 +107,14 @@ References: [VentraIP DNS management](https://ventraip.com.au/support-centre/add
 
 - Homepage: `src/pages/index.astro`.
 - World, races, story, gameplay and other static pages: `src/pages/`.
+- Weekly Development Updates combine the signed Launcher and Client release notes from the public downloads feed with the Server and infrastructure entries in `scripts/development-details.mjs`. The importer groups builds by the Sydney calendar week and refreshes the same news post when a new build is published that week.
 - Download links and shared metadata: `src/lib/site.ts`. The Linux link uses a stable URL on the separate `theia-mmo` Pages project.
   After the first game download release passes its live verification, set the
   website Actions variable `ENABLE_LINUX_DOWNLOADS` to `true` and dispatch its
   Pages workflow. The workflow verifies the live launcher and update feed
   before replacing the website. With the variable unset, the Linux download
   stays unavailable.
-- The header's Log In button (also available in the mobile menu) opens `src/components/LoginDialog.astro`. Website authentication is not connected: fields and submission are disabled, and the dialog explains client sign-in. Connect a verified authentication service before enabling the form; it currently sends and stores no credentials.
+- The header's **Account** link opens `/account/` for invited testers. Set GitHub Pages variables `THEIA_ACCOUNT_POOL_ID` and `THEIA_ACCOUNT_CLIENT_ID` to the account client outputs from the existing Cognito stack. The site uses Cognito SRP for setup, verifies a recovery email, offers optional authenticator setup and handles password reset codes. Invite and approve testers in Cognito. The browser keeps its account session in memory.
 - Source references and artwork provenance: [docs/CONTENT_SOURCES.md](docs/CONTENT_SOURCES.md), [docs/ASSETS.md](docs/ASSETS.md).
 
 ## Browser validation

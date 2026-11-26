@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readdir, readFile } from 'node:fs/promises';
 
 test('every page, local link and local image resolves under the configured base path', async ({ page, request, baseURL }) => {
-  const paths = ['', 'world/', 'races/', 'story/', 'gameplay/', 'media/', 'news/', 'download/', 'about/', 'community/', 'support/', 'news/development-update/', 'news/lore-spotlight-anchors/', 'news/a-world-worth-sharing/'];
+  const paths = ['', 'world/', 'races/', 'story/', 'gameplay/', 'media/', 'news/', 'download/', 'about/', 'community/', 'support/', 'account/', 'news/lore-spotlight-anchors/', 'news/a-world-worth-sharing/'];
   const checked = new Set<string>();
   for (const path of paths) {
     const response = await page.goto(path ? `./${path}` : './');
@@ -16,7 +16,7 @@ test('every page, local link and local image resolves under the configured base 
       const target = link.split('#')[0];
       if (!checked.has(target)) { expect((await request.get(target)).status(), target).toBe(200); checked.add(target); }
     }
-    const imagesLoaded = await page.locator('img').evaluateAll(images => images.every(element => { const img = element as HTMLImageElement; return !img.complete || img.naturalWidth > 0; }));
+    const imagesLoaded = await page.locator('img[src]').evaluateAll(images => images.every(element => { const img = element as HTMLImageElement; return !img.complete || img.naturalWidth > 0; }));
     expect(imagesLoaded, path).toBe(true);
   }
 });
@@ -46,11 +46,12 @@ test('homepage and news are built from the actual Markdown files; drafts never p
 test('news category filters work and restore all articles', async ({ page }) => {
   await page.goto('./news/');
   for (const category of ['Lore', 'Development', 'Release Notes', 'Community']) {
+    const matching = await page.locator(`.news-card[data-category="${category}"]`).count();
     const button = page.getByRole('button', { name: category, exact: true });
     await button.click();
     await expect(button).toHaveAttribute('aria-pressed', 'true');
     const categories = await page.locator('.news-card:visible').evaluateAll(cards => cards.map(card => card.getAttribute('data-category')));
-    expect(categories.length).toBeGreaterThan(0);
+    expect(categories).toHaveLength(matching);
     expect(categories.every(value => value === category)).toBe(true);
   }
   await page.getByRole('button', { name: 'All', exact: true }).click();
@@ -109,43 +110,24 @@ test('mobile menu opens, closes with Escape and navigates', async ({ page }) => 
   await expect(page).toHaveURL(/\/world\/$/);
 });
 
-test('login dialog opens, keeps focus inside, and closes on desktop and mobile', async ({ page }) => {
+test('Account opens on desktop and mobile and fits small screens', async ({ page }) => {
   for (const width of [1440, 390, 320]) {
     await page.setViewportSize({ width, height: width === 320 ? 568 : 900 });
     await page.goto('./');
-    const mobile = width < 600;
-    const menu = page.locator('.menu-toggle');
-    const trigger = page.locator(mobile ? '.mobile-login' : '.login-link');
-    const open = async () => {
-      if (mobile) await menu.click();
-      await trigger.click();
-    };
-    await open();
-    const dialog = page.getByRole('dialog', { name: 'Welcome back' });
-    await expect(dialog).toBeVisible();
-    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).toBe('hidden');
-    await expect(dialog.getByLabel('Username', { exact: true })).toBeDisabled();
-    await expect(dialog.getByLabel('Password', { exact: true })).toBeDisabled();
-    await expect(dialog.getByRole('button', { name: 'Log In', exact: true })).toBeDisabled();
-    const close = dialog.getByRole('button', { name: 'Close login dialog' });
-    await expect(close).toBeFocused();
-    await page.keyboard.press('Shift+Tab');
-    await expect(dialog.getByRole('link', { name: 'Getting started' })).toBeFocused();
-    const bounds = await dialog.boundingBox();
-    expect(bounds!.x).toBeGreaterThanOrEqual(0);
-    expect(bounds!.width).toBeLessThanOrEqual(width);
+    if (width < 600) await page.locator('.menu-toggle').click();
+    await page.locator(width < 600 ? '.mobile-login' : '.login-link').click();
+    await expect(page).toHaveURL(/\/account\/$/);
+    await expect(page.getByRole('heading', { name: 'Your Theia account' })).toBeVisible();
+    const form = page.getByRole('heading', { name: 'Set up your account' });
+    if (process.env.PUBLIC_THEIA_ACCOUNT_POOL_ID && process.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID) {
+      await expect(form).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Reset password' })).toBeVisible();
+    } else {
+      await expect(form).toBeHidden();
+      await expect(page.getByText('Account setup is currently unavailable.')).toBeVisible();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
     const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21aa']).analyze();
     expect(axe.violations).toEqual([]);
-    await page.screenshot({ path: `test-results/login-${width}.png` });
-    await page.keyboard.press('Escape');
-    await expect(dialog).not.toBeVisible();
-    await expect(mobile ? menu : trigger).toBeFocused();
-    expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflow)).not.toBe('hidden');
-    await open();
-    await close.click();
-    await expect(dialog).not.toBeVisible();
-    await open();
-    await page.mouse.click(2, 2);
-    await expect(dialog).not.toBeVisible();
   }
 });
