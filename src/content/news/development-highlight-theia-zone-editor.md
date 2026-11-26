@@ -3,8 +3,8 @@ title: Development Highlight — Building Theia’s MMO Editor in Bevy
 description: Our custom Bevy editor brings world building, particle authoring, and multiplayer playtesting into one workflow.
 date: 2026-11-21
 category: Development
-image: images/story/heartlands.webp
-imageAlt: Concept art of a village in the Heartlands
+image: images/news/zone-editor-cover.webp
+imageAlt: A miniature valley and its routes on a cartographer’s workbench
 ---
 
 We’re building Theia’s MMO editor directly in Bevy, the same engine we use for the game. What began as a small terrain and object editor now brings world building, quests, and particle effects together with multiplayer playtesting. We can sculpt a road, lay out an escort along it, place an effect near its destination, then start a session and see how the whole route plays with two people.

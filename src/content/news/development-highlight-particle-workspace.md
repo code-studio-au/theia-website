@@ -3,8 +3,8 @@ title: Development Highlight — A Particle Workspace for Theia
 description: An in-editor workspace for previewing particle effects and adjusting how they change over time.
 date: 2026-11-10
 category: Development
-image: images/news-development.webp
-imageAlt: Fantasy city beneath blue and gold banners
+image: images/news/particle-workspace-cover.webp
+imageAlt: Cyan motes curling above a stone slab in a lamplit workshop
 ---
 
 We adapted the Sprinkles particle tools to run inside Theia’s Bevy zone editor. The Particles workspace has its own preview camera and input focus. We can orbit an effect and adjust its emitters, then switch back to the zone in the same window.

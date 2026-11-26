@@ -1,0 +1,254 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import Button from '../../components/Button.astro';
+import { url } from '../../lib/site';
+
+export const getStaticPaths = (() =>
+  import.meta.env.DEV || import.meta.env.PUBLIC_THEIA_SUGGESTIONS_PREVIEW === 'true'
+    ? [{ params: { preview: 'ideas' } }]
+    : []) satisfies GetStaticPaths;
+
+const description = 'Share a feature idea or upvote the suggestions you’d like us to explore.';
+const art = 'images/news/community-ideas.webp';
+---
+
+<Base title="Ideas & suggestions" description={description} image={art} noindex>
+  <section class="inner-hero ornate-rule board-hero" style={`--section-image: url('${url(art)}')`}>
+    <div class="inner-hero-copy">
+      <a class="eyebrow" href={url('community/')}>Theia Community</a>
+      <h1>Ideas &amp; suggestions</h1>
+      <p>{description}</p>
+    </div>
+  </section>
+
+  <div class="inner-content wrap board">
+    <p class="preview-note"><strong>Prototype.</strong> Sample ideas are shown below. Your submissions and votes stay in this browser.</p>
+
+    <div class="board-columns">
+      <section aria-labelledby="board-heading">
+        <div class="board-toolbar">
+          <h2 id="board-heading">Community ideas</h2>
+          <label for="idea-order">Sort by</label>
+          <select id="idea-order">
+            <option value="votes">Most votes</option>
+            <option value="newest">Newest</option>
+          </select>
+        </div>
+        <ol id="idea-list" class="ideas" role="list"></ol>
+      </section>
+
+      <section class="content-panel submission" aria-labelledby="submission-heading">
+        <h2 id="submission-heading">Suggest an idea</h2>
+        <form id="idea-form">
+          <label for="idea-title">Title</label>
+          <input id="idea-title" name="title" required maxlength="80" placeholder="A short, specific name" />
+          <label for="idea-category">Category</label>
+          <select id="idea-category" name="category">
+            <option>Gameplay</option>
+            <option>World &amp; quests</option>
+            <option>Interface</option>
+            <option>Accessibility</option>
+            <option>Social</option>
+          </select>
+          <label for="idea-description">What would it help you do?</label>
+          <textarea id="idea-description" name="description" required maxlength="400" rows="4"></textarea>
+          <Button type="submit" primary>Submit idea</Button>
+          <p id="idea-form-status" class="form-status" role="status"></p>
+        </form>
+      </section>
+    </div>
+    <p id="vote-status" class="visually-hidden" role="status"></p>
+  </div>
+
+  <template id="idea-card">
+    <li class="idea-card">
+      <button type="button" class="vote" aria-pressed="false">
+        <span aria-hidden="true">▲</span>
+        <strong class="vote-count"></strong>
+      </button>
+      <div>
+        <p class="idea-category"></p>
+        <h3 class="idea-title"></h3>
+        <p class="idea-description"></p>
+      </div>
+    </li>
+  </template>
+</Base>
+
+<script>
+  type Idea = { id: string; title: string; category: string; description: string; votes: number };
+  type Board = { ideas: Idea[]; votersChoice: string[] };
+
+  const samples: Idea[] = [
+    { id: 'map-pins', title: 'Custom pins on the world map', category: 'World & quests', description: 'Mark a location and give it a name so I can return to a gathering spot or a trail I want to explore later.', votes: 24 },
+    { id: 'party-finder', title: 'Find a party for a quest', category: 'Social', description: 'Let me list the quest or zone I’m heading to so other players can join before we set off.', votes: 18 },
+    { id: 'reduced-effects', title: 'Reduce bright spell flashes', category: 'Accessibility', description: 'Offer a setting to tone down bright bursts while keeping important combat cues visible.', votes: 18 },
+    { id: 'binding-profiles', title: 'Save keybinding presets', category: 'Interface', description: 'Save a second layout for a different keyboard or play style and switch between them in Settings.', votes: 12 },
+  ];
+  const storageKey = 'theia-ideas-preview-v1';
+  function loadBoard(): Board {
+    try {
+      const saved = JSON.parse(localStorage.getItem(storageKey) ?? 'null');
+      if (Array.isArray(saved?.ideas) && Array.isArray(saved?.votersChoice)) return saved;
+    } catch {
+      // The preview also works when browser storage is unavailable.
+    }
+    return { ideas: samples, votersChoice: [] };
+  }
+
+  const board = loadBoard();
+  const list = document.querySelector<HTMLOListElement>('#idea-list')!;
+  const order = document.querySelector<HTMLSelectElement>('#idea-order')!;
+  const template = document.querySelector<HTMLTemplateElement>('#idea-card')!;
+  const form = document.querySelector<HTMLFormElement>('#idea-form')!;
+  const formStatus = document.querySelector<HTMLElement>('#idea-form-status')!;
+  const voteStatus = document.querySelector<HTMLElement>('#vote-status')!;
+  const titleInput = document.querySelector<HTMLInputElement>('#idea-title')!;
+  const descriptionInput = document.querySelector<HTMLTextAreaElement>('#idea-description')!;
+
+  function saveBoard() {
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(board));
+    } catch {
+      // Current-page interactions can continue without persistence.
+    }
+  }
+
+  function voteCount(idea: Idea) {
+    return idea.votes + Number(board.votersChoice.includes(idea.id));
+  }
+
+  function render(focusedId?: string) {
+    const orderedIdeas = order.value === 'newest'
+      ? [...board.ideas].reverse()
+      : [...board.ideas].sort((a, b) => voteCount(b) - voteCount(a));
+    let focusedButton: HTMLButtonElement | undefined;
+    const rows = orderedIdeas.map(idea => {
+      const row = template.content.firstElementChild!.cloneNode(true) as HTMLLIElement;
+      const button = row.querySelector<HTMLButtonElement>('.vote')!;
+      const pressed = board.votersChoice.includes(idea.id);
+      button.setAttribute('aria-label', `Upvote ${idea.title}, ${voteCount(idea)} votes`);
+      button.setAttribute('aria-pressed', String(pressed));
+      row.querySelector('.vote-count')!.textContent = String(voteCount(idea));
+      row.querySelector('.idea-category')!.textContent = idea.category;
+      row.querySelector('.idea-title')!.textContent = idea.title;
+      row.querySelector('.idea-description')!.textContent = idea.description;
+      button.addEventListener('click', () => {
+        board.votersChoice = pressed
+          ? board.votersChoice.filter(id => id !== idea.id)
+          : [...board.votersChoice, idea.id];
+        saveBoard();
+        voteStatus.textContent = pressed ? 'Vote removed.' : 'Vote added.';
+        render(idea.id);
+      });
+      if (idea.id === focusedId) focusedButton = button;
+      return row;
+    });
+    list.replaceChildren(...rows);
+    focusedButton?.focus({ preventScroll: true });
+  }
+
+  order.addEventListener('change', () => render());
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    const title = titleInput.value.trim();
+    const description = descriptionInput.value.trim();
+    if (!title || !description) {
+      formStatus.textContent = 'Enter a title and description.';
+      (title ? descriptionInput : titleInput).focus();
+      return;
+    }
+    const category = String(new FormData(form).get('category'));
+    board.ideas.push({ id: crypto.randomUUID(), title, category, description, votes: 0 });
+    saveBoard();
+    form.reset();
+    order.value = 'newest';
+    render();
+    formStatus.textContent = 'Your idea was added to this preview.';
+  });
+
+  render();
+</script>
+
+<style>
+  .board-hero {
+    min-height: 248px;
+    padding-block: 32px;
+    background-position: center 49%;
+  }
+
+  .board-hero a:hover { text-decoration: underline; }
+  .board-hero h1 { margin-top: 10px; }
+  .board { max-width: 1120px; padding-top: 30px; }
+  .preview-note { color: var(--muted); font-size: 16px; margin-bottom: 22px; }
+  .preview-note strong { color: var(--gold); }
+
+  .board-columns {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(275px, 31%);
+    gap: 24px;
+    align-items: start;
+  }
+
+  .board-toolbar { display: flex; gap: 10px; align-items: center; margin-bottom: 14px; }
+  .board-toolbar h2 { flex: 1; color: var(--gold); font-family: var(--display); font-size: 24px; }
+  .board-toolbar label { color: var(--muted); font-size: 16px; }
+  .ideas { padding: 0; margin: 0; list-style: none; display: grid; gap: 10px; }
+
+  .idea-card {
+    display: grid;
+    grid-template-columns: 53px minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    padding: 16px;
+    background: linear-gradient(135deg, #0b2639, #061b2a);
+    border: 1px solid #a879356c;
+    overflow-wrap: anywhere;
+  }
+
+  .vote {
+    display: grid;
+    justify-items: center;
+    place-content: center;
+    min-height: 56px;
+    line-height: 1;
+    gap: 4px;
+    border: 1px solid #a8793599;
+    background: #061725;
+    color: var(--gold);
+  }
+
+  .vote span { font-size: 12px; }
+  .vote:hover { border-color: var(--gold); }
+  .vote[aria-pressed="true"] { background: #4c3313; border-color: var(--gold); color: #fff0c6; }
+  .idea-category { color: #d7b681; font-size: 14px; }
+  .idea-title { color: #ffdda0; font-size: 23px; line-height: 1.2; margin: 3px 0 6px; }
+  .idea-description { color: #e1e7e9; font-size: 18px; line-height: 1.35; }
+  .submission { padding: 22px; }
+  .submission h2 { font-size: 22px; }
+  .submission label { display: block; margin: 12px 0 3px; }
+  .submission :is(input, select, textarea) { width: 100%; }
+  .submission textarea { display: block; resize: vertical; }
+  .submission :global(.button) { margin-top: 15px; }
+  .form-status { color: var(--gold); font-size: 16px; }
+  .form-status:not(:empty) { margin-top: 8px; }
+
+  :is(input, select, textarea) {
+    background: #061725;
+    color: var(--white);
+    border: 1px solid #aa803e99;
+    border-radius: 0;
+    font: inherit;
+    padding: 6px 9px;
+  }
+
+  :is(input, select, textarea):focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  @media (max-width: 760px) {
+    .board { width: 92%; }
+    .board-columns { grid-template-columns: 1fr; }
+    .board-toolbar { flex-wrap: wrap; }
+    .board-toolbar h2 { min-width: 150px; }
+  }
+</style>
