@@ -58,6 +58,43 @@ test('news category filters work and restore all articles', async ({ page }) => 
   expect(await page.locator('.news-card:visible').count()).toBe(await page.locator('.news-card').count());
 });
 
+test('news screenshots fill the article column and keep their original proportions', async ({ page }) => {
+  const posts = [
+    { slug: 'development-highlight-theia-zone-editor', screenshotCount: 2 },
+    { slug: 'development-highlight-particle-workspace', screenshotCount: 1 },
+  ];
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const { slug, screenshotCount } of posts) {
+      await page.goto(`./news/${slug}/`);
+      const article = page.locator('.article-body');
+      const columnWidth = await article.evaluate(element => {
+        const style = getComputedStyle(element);
+        return element.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      });
+      const screenshots = article.locator('figure img');
+      await expect(screenshots).toHaveCount(screenshotCount);
+      const enlargeNotes = article.locator('figure > figcaption > em');
+      await expect(enlargeNotes).toHaveText(Array(screenshotCount).fill('(click to enlarge)'));
+      for (const screenshot of await screenshots.all()) {
+        await screenshot.scrollIntoViewIfNeeded();
+        const size = await screenshot.evaluate(async (image: HTMLImageElement) => {
+          await image.decode();
+          return {
+            width: image.offsetWidth,
+            height: image.clientHeight,
+            proportionalHeight: image.clientWidth * image.naturalHeight / image.naturalWidth,
+            opensSourceImage: image.closest('a')?.href === image.src,
+          };
+        });
+        expect(Math.abs(size.height - size.proportionalHeight), `${slug} screenshot height at ${width}px`).toBeLessThanOrEqual(1);
+        expect(size.width, `${slug} screenshot width at ${width}px`).toBe(columnWidth);
+        expect(size.opensSourceImage).toBe(true);
+      }
+    }
+  }
+});
+
 test('desktop and mobile layouts have no overflow or serious accessibility violations', async ({ page }) => {
   for (const width of [1440, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
