@@ -126,8 +126,18 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
       await expect(continueButton).toHaveAttribute('type', 'submit');
       const playNowFill = await page.locator('.header-actions .button-primary > span')
         .evaluate(element => getComputedStyle(element).backgroundImage);
-      await expect(continueButton.locator('span')).toHaveCSS('background-image', playNowFill);
-      await expect(page.getByRole('button', { name: 'Reset password' })).toBeVisible();
+      const accountActions = page.locator('[data-account] button, [data-view="complete"] a');
+      expect(await accountActions.evaluateAll(actions => actions.map(action => {
+        const fill = action.querySelector('span');
+        return fill ? getComputedStyle(fill).backgroundImage : '';
+      }))).toEqual(Array(await accountActions.count()).fill(playNowFill));
+      const back = page.locator('[data-action="start-over"]');
+      await expect(back).toBeHidden();
+      await page.getByRole('button', { name: 'Reset password', exact: true }).click();
+      await expect(back).toBeVisible();
+      await back.click();
+      await expect(continueButton).toBeVisible();
+      await expect(back).toBeHidden();
     } else {
       await expect(form).toBeHidden();
       await expect(page.getByText('Account setup is currently unavailable.')).toBeVisible();
