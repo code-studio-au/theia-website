@@ -11,6 +11,6 @@ Theia is inviting pre-alpha testers to try early builds, report bugs, and share 
 
 ## Request an invitation
 
-Use the [Request Access form](../../download/#request-access) to submit your email address. You can also tell us which parts of the game you’re interested in testing.
+Use the [Request Access form](../../download/#request-access) to submit your email address and select your platform.
 
 If selected, you’ll receive an invitation by email. The current playtest uses the Linux AMD64 launcher, available from your Theia account once your access is approved.

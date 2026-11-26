@@ -135,9 +135,9 @@ test('Playtest access requests complete on the download page', async ({ page }) 
   const pageUrl = page.url();
   const email = section.getByLabel('Email address');
   const platform = section.getByRole('combobox', { name: 'Platform' });
-  const message = section.getByLabel(/What would you like to test/);
   const submit = section.getByRole('button', { name: 'Request an invitation' });
   const status = section.getByRole('status');
+  await expect(section.getByRole('textbox')).toHaveCount(1);
   await expect(platform.getByRole('option')).toHaveText(['Select a platform', 'Windows', 'Linux', 'Mac']);
   let attempts = 0;
   await page.route(`https://formspree.io/f/${formId}`, async (route) => {
@@ -147,7 +147,6 @@ test('Playtest access requests complete on the download page', async ({ page }) 
     expect(request.headers().accept).toBe('application/json');
     expect(request.postData()).toContain('tester@example.com');
     expect(request.postData()).toMatch(/name="platform"\r?\n\r?\nWindows/);
-    expect(request.postData()).toContain('Party quests');
     await route.fulfill({
       status: attempts === 1 ? 429 : 200,
       headers: { 'access-control-allow-origin': '*' },
@@ -162,7 +161,6 @@ test('Playtest access requests complete on the download page', async ({ page }) 
   await expect(platform).toBeFocused();
   expect(attempts).toBe(0);
   await platform.selectOption('Windows');
-  await message.fill('Party quests');
   await submit.click();
   await expect(status).toContainText('Please try again later.');
   await expect(email).toHaveValue('tester@example.com');
