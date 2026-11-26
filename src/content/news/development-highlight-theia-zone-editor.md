@@ -24,8 +24,9 @@ We can place named NPCs, draw spawn areas for creatures, and define patrol route
 <figure>
   <a href="../../images/news/theia-zone-editor-escort-route.webp">
     <img src="../../images/news/theia-zone-editor-escort-route.webp" width="3440" height="1440" loading="lazy" alt="The Theia zone editor showing an escort route, its destination marker, and the quest inspector">
+    <span>Click to enlarge</span>
   </a>
-  <figcaption>An escort route in the starter valley. Select the screenshot to see the route and inspector at full size.</figcaption>
+  <figcaption>An escort route in the starter valley.</figcaption>
 </figure>
 
 ## Author particle effects in the same editor
@@ -43,6 +44,7 @@ The captured previews closely matched in shape, colour, and arrangement. The Mag
 <figure>
   <a href="../../images/news/theia-particle-visual-comparison.webp">
     <img src="../../images/news/theia-particle-visual-comparison.webp" width="1500" height="712" loading="lazy" alt="Two closely matching Magic Puff particle previews, the original Sprinkles preview on the left and Theia’s port on the right">
+    <span>Click to enlarge</span>
   </a>
   <figcaption>The Magic Puff example at 30 simulation steps. Original Sprinkles on the left, Theia’s port on the right.</figcaption>
 </figure>

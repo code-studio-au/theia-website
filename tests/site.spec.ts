@@ -74,6 +74,8 @@ test('news screenshots fill the article column and keep their original proportio
       });
       const screenshots = article.locator('figure img');
       await expect(screenshots).toHaveCount(screenshotCount);
+      const enlargeLinks = article.locator('figure').getByRole('link', { name: /Click to enlarge/ });
+      await expect(enlargeLinks).toHaveCount(screenshotCount);
       for (const screenshot of await screenshots.all()) {
         await screenshot.scrollIntoViewIfNeeded();
         const size = await screenshot.evaluate(async (image: HTMLImageElement) => {
@@ -82,10 +84,12 @@ test('news screenshots fill the article column and keep their original proportio
             width: image.offsetWidth,
             height: image.clientHeight,
             proportionalHeight: image.clientWidth * image.naturalHeight / image.naturalWidth,
+            opensSourceImage: image.closest('a')?.href === image.src,
           };
         });
         expect(Math.abs(size.height - size.proportionalHeight), `${slug} screenshot height at ${width}px`).toBeLessThanOrEqual(1);
         expect(size.width, `${slug} screenshot width at ${width}px`).toBe(columnWidth);
+        expect(size.opensSourceImage).toBe(true);
       }
     }
   }
