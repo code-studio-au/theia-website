@@ -9,10 +9,14 @@ export function getStaticPaths() {
 const pool = import.meta.env.PUBLIC_THEIA_ACCOUNT_POOL_ID ?? '';
 const client = import.meta.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID ?? '';
 const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$/.test(client);
+const characterOrigin = import.meta.env.PUBLIC_THEIA_CHARACTER_API_ORIGIN ?? '';
+const rosterUrl = /^https:\/\/([a-z0-9-]+\.)+theiaonline\.com$/i.test(characterOrigin)
+  ? `${characterOrigin}/v1/me/characters` : undefined;
 ---
 <Inner title="Your Theia account" eyebrow="Playtest access" description="Set up an invited account, add an authenticator, or recover your password.">
   <section class="account" data-account data-pool={configured ? pool : undefined} data-client={configured ? client : undefined}
-    data-account-url={url('account/')} data-profile-url={url('account/profile/')} aria-label="Theia account">
+    data-account-url={url('account/')} data-profile-url={url('account/profile/')}
+    data-roster-url={rosterUrl} aria-label="Theia account">
     <p data-unavailable>Account setup is currently unavailable. <a href={url('support/')}>Get help</a>.</p>
     <p class="account-message" data-message aria-live="polite" hidden></p>
     <section data-view="sign-in" hidden>
@@ -86,17 +90,58 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
         <Button primary href={url('download/')}>Get the launcher</Button>
       </div>
     </section>
-    <section data-view="profile" hidden>
-      <h2 tabindex="-1">Account overview</h2>
-      <p>Signed in as <strong data-profile-name></strong></p>
-      <dl class="account-status">
-        <div><dt>Account setup</dt><dd data-account-setup></dd></div>
-        <div><dt>Game access</dt><dd data-game-access></dd></div>
-      </dl>
-      <div class="buttons" data-profile-authenticator hidden>
-        <Button primary type="button" data-action="setup-totp">Set up authenticator</Button>
+    <section data-view="profile" class="profile-grid" aria-label="Account overview" hidden>
+      <div class="profile-main">
+        <section class="realm-card" aria-labelledby="profile-realm" style={`--realm-art: url('${url('images/covenant-high-city.webp')}')`}>
+          <div class="realm-copy">
+            <p class="realm-caption">Development realm</p>
+            <h2 id="profile-realm">Theia</h2>
+            <dl class="realm-access"><dt>Game access</dt><dd data-game-access></dd></dl>
+            <div data-profile-download hidden><Button primary href={url('download/')}>Get the launcher</Button></div>
+          </div>
+        </section>
+        <section class="profile-panel" aria-labelledby="account-characters">
+          <h2 id="account-characters">My characters</h2>
+          <p class="roster-status" aria-live="polite" data-roster-status></p>
+          <div class="roster-layout" data-roster-layout hidden>
+            <ul class="character-roster" data-roster aria-label="Choose a character"></ul>
+            <article class="character-summary" aria-label="Selected character" style={`--character-art: url('${url('images/story/heartlands.webp')}')`}>
+              <div>
+                <p class="realm-caption">Theia</p>
+                <h3 aria-live="polite" data-selected-character></h3>
+                <dl class="character-stats">
+                  <div><dt>Level</dt><dd data-character-level></dd></div>
+                  <div><dt>Total XP</dt><dd data-character-xp></dd></div>
+                  <div><dt>Last saved</dt><dd><time data-character-saved></time></dd></div>
+                </dl>
+              </div>
+            </article>
+          </div>
+        </section>
       </div>
-      <button class="account-link" type="button" data-action="sign-out">Sign out</button>
+      <aside class="profile-sidebar" aria-label="Account settings and help">
+        <section class="profile-panel" aria-labelledby="profile-security">
+          <h2 id="profile-security">Account &amp; security</h2>
+          <dl class="account-status">
+            <div><dt>Username</dt><dd data-profile-name></dd></div>
+            <div><dt>Account setup</dt><dd data-account-setup></dd></div>
+            <div><dt>Authenticator</dt><dd data-mfa-status></dd></div>
+          </dl>
+          <div class="buttons profile-actions">
+            <div data-profile-authenticator hidden>
+              <Button primary type="button" data-action="setup-totp">Set up authenticator</Button>
+            </div>
+            <button class="account-link" type="button" data-action="sign-out">Sign out</button>
+          </div>
+        </section>
+        <section class="profile-panel" aria-labelledby="profile-help">
+          <h2 id="profile-help">Playtest help</h2>
+          <ul class="profile-links">
+            <li><a class="account-link" href={url('support/')}>Get support</a></li>
+            <li><a class="account-link" href={url('news/')}>Development updates</a></li>
+          </ul>
+        </section>
+      </aside>
     </section>
     <section data-view="reset" hidden>
       <h2 tabindex="-1">Reset your password</h2>
@@ -139,9 +184,67 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
   .account button:disabled { opacity: .65; cursor: wait; }
   .account .buttons { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; }
   .account .buttons[hidden] { display: none; }
-  .account-status { margin: 0 0 1rem; }
-  .account-status div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; padding: .5rem 0; border-bottom: 1px solid #9b855b; }
-  .account-status dd { margin: 0; color: var(--gold); }
+  .account.is-profile { width: 100%; padding: 0; border: 0; background: transparent; }
+  :global(main:has(.account.is-profile) .inner-hero) {
+    min-height: 0;
+    padding: 2.25rem 0 1rem;
+    text-align: left;
+    border: 0;
+    background: radial-gradient(ellipse at 45% 0, #112d3d, transparent 70%);
+  }
+  :global(main:has(.account.is-profile) .inner-hero::after) { display: none; }
+  :global(main:has(.account.is-profile) .inner-hero-copy) { width: 85%; max-width: 1200px; }
+  :global(main:has(.account.is-profile) .inner-hero-copy p) { display: none; }
+  :global(main:has(.account.is-profile) .inner-hero h1) { margin: 0; font-size: clamp(1.8rem, 4vw, 3rem); }
+  :global(main:has(.account.is-profile) .inner-content) { padding-block-start: 1rem; }
+
+  .profile-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(16rem, 1fr); gap: 1.25rem; align-items: start; }
+  .profile-grid[hidden], .roster-layout[hidden] { display: none; }
+  .profile-main, .profile-sidebar { display: grid; min-width: 0; gap: 1.25rem; }
+  .profile-panel, .realm-card { border: 1px solid #9a753b; background-color: #081e2d; }
+  .profile-panel { padding: clamp(1rem, 2.5vw, 1.5rem); background-image: linear-gradient(155deg, #102c3e, #061a28 70%); }
+  .profile-panel h2 { margin-bottom: .9rem; padding-bottom: .65rem; border-bottom: 1px solid #9a753b; font-size: clamp(1.15rem, 2vw, 1.45rem); }
+  .realm-card {
+    display: grid;
+    align-items: end;
+    min-height: 15rem;
+    padding: clamp(1.25rem, 4vw, 2rem);
+    background-image: linear-gradient(90deg, #041521 6%, #041521e8 30%, #04152152 70%),
+      linear-gradient(0deg, #041521b0, transparent 65%), var(--realm-art);
+    background-position: center, center, center 44%;
+    background-size: cover;
+  }
+  .realm-copy h2 { margin: 0; font-size: clamp(2.2rem, 5vw, 4rem); line-height: 1.07; color: #ffdda0; }
+  .account .realm-caption { margin: 0; color: #ffe2a2; font-size: 1rem; }
+  .realm-access { display: flex; flex-wrap: wrap; align-items: baseline; gap: .3rem .8rem; margin: .7rem 0 1rem; }
+  .realm-access dd { margin: 0; font-weight: 600; color: #ffe0a0; }
+  .account-status { margin: .1rem 0 1rem; }
+  .account-status div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .25rem 1rem; padding: .45rem 0; }
+  .account-status dd { margin: 0; color: #ffe0a0; overflow-wrap: anywhere; min-width: 0; }
+  .profile-actions { margin-top: .5rem; }
+  .account .roster-status { margin: 0; }
+  .roster-status:not(:empty) { padding: .8rem .9rem; border: 1px solid #987747; background: #041826; color: #e6ded0; }
+  .roster-layout { display: grid; grid-template-columns: minmax(8rem, .76fr) minmax(0, 1.35fr); gap: .85rem; align-items: start; }
+  .character-roster, .profile-links { list-style: none; padding: 0; margin: 0; }
+  .character-roster { display: grid; gap: .5rem; }
+  .character-roster :global(button) { width: 100%; min-height: 44px; padding: .45rem .75rem; border: 1px solid #8f7247; background: #051d2c; color: var(--white); text-align: left; overflow-wrap: anywhere; }
+  .character-roster :global(button:hover) { background: #153344; }
+  .character-roster :global(button[aria-pressed="true"]) { color: #ffe1a4; border-color: #e6b45c; background: linear-gradient(110deg, #49351c, #183141); }
+  .character-summary { display: grid; align-items: end; min-height: 12.5rem; padding: 1rem; border: 1px solid #9a753b; background: linear-gradient(0deg, #021520, #021520e6 38%, #02152030), var(--character-art) center 58% / cover; }
+  .character-summary h3 { font-family: var(--display); font-weight: 400; font-size: clamp(1.3rem, 3vw, 1.9rem); line-height: 1.12; color: #ffdda0; overflow-wrap: anywhere; }
+  .character-stats { display: flex; flex-wrap: wrap; gap: .55rem clamp(.8rem, 2vw, 1.4rem); margin: .8rem 0 0; padding-top: .65rem; border-top: 1px solid #9a753b; }
+  .character-stats dt { color: #e3c898; font-size: .8rem; line-height: 1.25; }
+  .character-stats dd { margin: .2rem 0 0; color: var(--white); line-height: 1.3; }
+  .profile-links .account-link { display: inline-flex; align-items: center; }
+  @media (max-width: 760px) {
+    .profile-grid { grid-template-columns: 1fr; }
+    .realm-card { min-height: 13rem; }
+  }
+  @media (max-width: 470px) {
+    .roster-layout { grid-template-columns: 1fr; }
+    .character-summary { grid-row: 1; min-height: 11rem; }
+    .character-roster { grid-template-columns: repeat(auto-fit, minmax(min(7rem, 100%), 1fr)); }
+  }
   .account .account-message { color: #fff0ca; margin-bottom: 1rem; }
   .account .start-over { margin-top: 1rem; }
   .account img[data-totp-qr] { width: 180px; height: 180px; margin: 1rem 0; }
