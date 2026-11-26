@@ -1,5 +1,6 @@
 ---
 import Inner from '../layouts/Inner.astro';
+import Button from '../components/Button.astro';
 import { url } from '../lib/site';
 const pool = import.meta.env.PUBLIC_THEIA_ACCOUNT_POOL_ID ?? '';
 const client = import.meta.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID ?? '';
@@ -15,7 +16,7 @@ const configured = /^ap-southeast-2_[A-Za-z0-9]+$/.test(pool) && /^[A-Za-z0-9]+$
       <form data-step="sign-in" method="post">
         <label>Username<input name="username" autocomplete="username" maxlength="128" required /></label>
         <label>Password<input name="password" type="password" autocomplete="current-password" maxlength="256" required /></label>
-        <div class="buttons"><button class="button button-primary" type="submit">Continue</button><button type="button" data-action="show-reset">Reset password</button></div>
+        <div class="buttons"><Button primary type="submit">Continue</Button><button type="button" data-action="show-reset">Reset password</button></div>
       </form>
     </section>
     <section data-view="new-password" hidden>

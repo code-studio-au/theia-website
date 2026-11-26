@@ -121,6 +121,12 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
     const form = page.getByRole('heading', { name: 'Set up your account' });
     if (process.env.PUBLIC_THEIA_ACCOUNT_POOL_ID && process.env.PUBLIC_THEIA_ACCOUNT_CLIENT_ID) {
       await expect(form).toBeVisible();
+      const continueButton = page.getByRole('button', { name: 'Continue', exact: true });
+      await expect(continueButton).toBeVisible();
+      await expect(continueButton).toHaveAttribute('type', 'submit');
+      const playNowFill = await page.locator('.header-actions .button-primary > span')
+        .evaluate(element => getComputedStyle(element).backgroundImage);
+      await expect(continueButton.locator('span')).toHaveCSS('background-image', playNowFill);
       await expect(page.getByRole('button', { name: 'Reset password' })).toBeVisible();
     } else {
       await expect(form).toBeHidden();
