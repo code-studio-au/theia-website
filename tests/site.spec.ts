@@ -126,11 +126,17 @@ test('Account opens on desktop and mobile and fits small screens', async ({ page
       await expect(continueButton).toHaveAttribute('type', 'submit');
       const playNowFill = await page.locator('.header-actions .button-primary > span')
         .evaluate(element => getComputedStyle(element).backgroundImage);
-      const accountActions = page.locator('[data-account] button, [data-view="complete"] a');
+      const accountActions = page.locator('[data-account] .button-primary');
       expect(await accountActions.evaluateAll(actions => actions.map(action => {
         const fill = action.querySelector('span');
         return fill ? getComputedStyle(fill).backgroundImage : '';
       }))).toEqual(Array(await accountActions.count()).fill(playNowFill));
+      const linkActions = page.locator('[data-account] button:not(.button-primary)');
+      expect(await linkActions.allTextContents()).toEqual(['Skip for now', 'Back to account setup']);
+      for (const link of await linkActions.all()) {
+        await expect(link).toHaveCSS('text-decoration-line', 'underline');
+        await expect(link).toHaveCSS('background-image', 'none');
+      }
       const back = page.locator('[data-action="start-over"]');
       await expect(back).toBeHidden();
       await page.getByRole('button', { name: 'Reset password', exact: true }).click();
