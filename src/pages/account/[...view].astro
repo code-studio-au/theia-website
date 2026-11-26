@@ -1,7 +1,8 @@
 ---
 import Inner from '../../layouts/Inner.astro';
 import Button from '../../components/Button.astro';
-import { site, url } from '../../lib/site';
+import LauncherPlatforms from '../../components/LauncherPlatforms.astro';
+import { url } from '../../lib/site';
 
 export function getStaticPaths() {
   return [{ params: { view: undefined } }, { params: { view: 'profile' } }];
@@ -96,12 +97,6 @@ const rosterUrl = /^https:\/\/([a-z0-9-]+\.)+theiaonline\.com$/i.test(characterO
             <p class="realm-caption">Development realm</p>
             <h2 id="profile-realm">Theia</h2>
             <dl class="realm-access"><dt>Game access</dt><dd data-game-access></dd></dl>
-            <div data-profile-download></div>
-            {site.downloads.linux && (
-              <template data-profile-launcher>
-                <Button primary href={site.downloads.linux}>Download Launcher</Button>
-              </template>
-            )}
           </div>
         </section>
         <section class="profile-panel" aria-labelledby="account-characters">
@@ -146,6 +141,13 @@ const rosterUrl = /^https:\/\/([a-z0-9-]+\.)+theiaonline\.com$/i.test(characterO
           </ul>
         </section>
       </aside>
+      <section class="profile-panel profile-downloads" data-profile-download aria-labelledby="profile-downloads-title" hidden>
+        <h2 id="profile-downloads-title">Downloads</h2>
+        <template data-profile-platforms>
+          <LauncherPlatforms context="account" />
+        </template>
+        <div data-profile-download-options></div>
+      </section>
     </section>
     <section data-view="reset" hidden>
       <h2 tabindex="-1">Reset your password</h2>
@@ -208,6 +210,7 @@ const rosterUrl = /^https:\/\/([a-z0-9-]+\.)+theiaonline\.com$/i.test(characterO
   .profile-panel, .realm-card { border: 1px solid #9a753b; background-color: #081e2d; }
   .profile-panel { padding: clamp(1rem, 2.5vw, 1.5rem); background-image: linear-gradient(155deg, #102c3e, #061a28 70%); }
   .profile-panel h2 { margin-bottom: .9rem; padding-bottom: .65rem; border-bottom: 1px solid #9a753b; font-size: clamp(1.15rem, 2vw, 1.45rem); }
+  .profile-downloads { grid-column: 1 / -1; }
   .realm-card {
     display: grid;
     align-items: end;

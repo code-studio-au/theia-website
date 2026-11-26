@@ -1,25 +1,12 @@
 ---
 import Inner from '../layouts/Inner.astro';
 import Button from '../components/Button.astro';
-import { url } from '../lib/site';
+import LauncherPlatforms from '../components/LauncherPlatforms.astro';
 const formId = (import.meta.env.PUBLIC_THEIA_PLAYTEST_FORM_ID ?? '').trim();
 const requestEndpoint = /^[a-z0-9]{1,64}$/i.test(formId) ? `https://formspree.io/f/${formId}` : undefined;
-const platforms = [
-  { id: 'windows', name: 'Windows', status: 'Planned', description: 'A Windows installer is planned. Supported versions and requirements will be confirmed with a public release.' },
-  { id: 'linux', name: 'Linux', status: 'Available - Pre-Alpha Testers Only', description: 'The Linux AMD64 launcher is available from your account after playtest approval.' },
-  { id: 'macos', name: 'Mac', status: 'Planned', description: 'A macOS version is planned. Supported Mac models and system requirements will be confirmed with a future release.' },
-] as const;
 ---
 <Inner title="Your Journey Awaits" eyebrow="Play Theia Online" description="A living world is taking shape. Follow its development and prepare for your first adventure." image="images/hero.webp">
-  <div class="content-grid platform-grid">
-    {platforms.map((platform) => <section class:list={["content-panel", { "linux-platform": platform.id === "linux" }]}>
-      <span class="status-label">{platform.status}</span>
-      <h2>{platform.name}</h2>
-      <p>{platform.description}</p>
-      <button class:list={['button', 'launcher-button', { 'button-primary': platform.id === 'linux' }]} type="button" disabled><span>Download Launcher</span></button>
-      {platform.id === 'linux' && <p class="launcher-sign-in"><a href={url('account/')}>Sign in to your account</a></p>}
-    </section>)}
-  </div>
+  <LauncherPlatforms />
   <section class="content-panel access-request" id="request-access" aria-labelledby="request-access-title">
     <div>
       <h2 id="request-access-title">Request Access</h2>
@@ -42,17 +29,6 @@ const platforms = [
 </Inner>
 
 <style>
-  .platform-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .linux-platform {
-    border-color: #c8a263;
-    background: radial-gradient(ellipse at top, #b78a3420, transparent 70%), linear-gradient(135deg, #103246, #061f2e);
-    box-shadow: 0 0 20px #c99a3814;
-  }
-  .linux-platform .status-label { color: #ffe2a1; border-color: #b99555; background: #b9955514; }
-  .launcher-button { border: 0; color: inherit; font-family: inherit; }
-  .launcher-button:disabled { opacity: .45; cursor: not-allowed; }
-  .launcher-button:disabled:hover { filter: none; }
-  .linux-platform .launcher-sign-in { margin: .85rem 0 0; }
   .access-request { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem clamp(1.25rem, 5vw, 4rem); }
   .access-request fieldset { display: grid; gap: .8rem; min-width: 0; margin: 0; padding: 0; border: 0; }
   .access-request label { display: grid; gap: .3rem; }
@@ -69,9 +45,6 @@ const platforms = [
   .access-request form :global(.button:disabled) { opacity: .65; }
   .access-request [data-request-status] { margin: 0; color: #ffdda0; }
   .access-request [data-request-status]:not(:empty) { margin-top: .8rem; }
-  @media (max-width: 900px) {
-    .platform-grid { grid-template-columns: 1fr; }
-  }
   @media (max-width: 680px) {
     .access-request { grid-template-columns: 1fr; }
   }
